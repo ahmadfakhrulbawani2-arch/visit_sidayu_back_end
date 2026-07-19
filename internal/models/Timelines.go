@@ -4,22 +4,17 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"gorm.io/gorm"
 )
 
 // TimelinesElement
 type TimelinesElement struct {
+	BaseModel
 	ID               uuid.UUID `json:"ID" gorm:"primaryKey"`
 	Name             string    `json:"name" gorm:"not null"`
 	TimelineDatetime time.Time `json:"timeline_datetime" gorm:"not null"`
 	Description      string    `json:"description,omitempty"`
 	ExternalLink     string    `json:"external_link,omitempty"`
 	TimelinesID      uuid.UUID `json:"timelines_id" gorm:"not null"`
-}
-
-func (t *TimelinesElement) BeforeCreate(tx *gorm.DB) (err error) {
-	t.ID = uuid.New()
-	return
 }
 
 type CreateTimelinesElement struct {

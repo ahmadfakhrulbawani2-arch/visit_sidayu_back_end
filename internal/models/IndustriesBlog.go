@@ -9,7 +9,7 @@ type IndustriesBlog struct {
 	Location                   string     `json:"location,omitempty"`
 	Rating                     float64    `json:"rating,omitempty"`
 	Revenue                    float64    `json:"revenue,omitempty"`
-	ProducedProducts           []string   `json:"produced_products" gorm:"not null"`
+	ProducedProducts           []string   `json:"produced_products" gorm:"type:text[];not null"`
 	ProductionRatesPiecePerDay int        `json:"production_rates_per_day,omitempty"`
 	ThumbnailID                *uuid.UUID `json:"thumbnail_id,omitempty"`
 	Thumbnail                  *Images    `json:"thumbnail,omitempty" gorm:"foreignKey:ThumbnailID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:RESTRICT;"`
