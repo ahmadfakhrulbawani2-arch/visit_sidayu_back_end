@@ -1,0 +1,1 @@
+go run migrations/migrate_down.go
