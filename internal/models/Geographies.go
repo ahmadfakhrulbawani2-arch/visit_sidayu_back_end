@@ -19,11 +19,12 @@ type Geographies struct {
 type CreateGeographies struct {
 	VillageName  string     `json:"village_name" binding:"required"`
 	Area         float64    `json:"area"`
-	AreaUnit     string     `json:"area_unit" gorm:"not null"`
+	AreaUnit     string     `json:"area_unit" binding:"required"`
 	RainfallRate float64    `json:"rainfall_rate"`
-	RainfallUnit string     `json:"rainfall_unit" gorm:"not null"`
+	RainfallUnit string     `json:"rainfall_unit" binding:"required"`
 	RainyDay     int        `json:"rainy_day"`
 	ImageID      *uuid.UUID `json:"image_id"`
+	Source       string     `json:"source" binding:"required"`
 }
 
 type GetDistrictGeographies struct {

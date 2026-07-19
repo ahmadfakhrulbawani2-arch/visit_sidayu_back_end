@@ -6,7 +6,7 @@ type Galleries struct {
 	BaseModel
 	Name        string    `json:"name" gorm:"not null"`
 	Description string    `json:"description" gorm:"not null"`
-	Slug        string    `json:"slug" gorm:"not null"` // in FE it's not mandatory, BE will auto fill if no slug provided
+	Slug        string    `json:"slug" gorm:"unique;not null"` // in FE it's not mandatory, BE will auto fill if no slug provided
 	ImageID     uuid.UUID `json:"image_id" gorm:"not null"`
 	Image       Images    `json:"image" gorm:"foreignKey:ImageID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:RESTRICT;"`
 }
