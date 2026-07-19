@@ -1,0 +1,1 @@
+go run ./cmd/scripts/main.go $args

@@ -3,7 +3,6 @@ package config
 import (
 	"log"
 	"os"
-	"simple_go_gin_gorm_postgres_be_template/internal/models"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -22,11 +21,6 @@ func ConnectDB() {
 
 	if err != nil {
 		log.Fatal("❌ Failed to connect the database : ", err)
-	}
-
-	err = database.AutoMigrate(&models.Event{}, models.User{}, models.Image{})
-	if err != nil {
-		log.Fatal("❌ Failed to do database migration : ", err)
 	}
 
 	DB = database
