@@ -1,0 +1,33 @@
+package models
+
+import "github.com/google/uuid"
+
+type IndustriesBlog struct {
+	BaseModel
+	Title                      string     `json:"title" gorm:"not null"`
+	Content                    string     `json:"content" gorm:"not null"`
+	Location                   string     `json:"location,omitempty"`
+	Rating                     float64    `json:"rating,omitempty"`
+	Revenue                    float64    `json:"revenue,omitempty"`
+	ProducedProducts           []string   `json:"produced_products" gorm:"not null"`
+	ProductionRatesPiecePerDay int        `json:"production_rates_per_day,omitempty"`
+	ThumbnailID                *uuid.UUID `json:"thumbnail_id,omitempty"`
+	Thumbnail                  *Images    `json:"thumbnail,omitempty" gorm:"foreignKey:ThumbnailID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:RESTRICT;"`
+	YearFounded                int        `json:"year_founded" gorm:"not null"`
+	EmployeesCount             int        `json:"employees_count" gorm:"not null"`
+	BusinessType               string     `json:"business_type" gorm:"not null"`
+}
+
+type CreateIndustriesBlogReq struct {
+	Title                      string     `json:"title" binding:"required"`
+	Content                    string     `json:"content" binding:"required"`
+	Location                   string     `json:"location"`
+	Rating                     float64    `json:"rating"`
+	Revenue                    float64    `json:"revenue"`
+	ProducedProducts           []string   `json:"produced_products" binding:"required"`
+	ProductionRatesPiecePerDay int        `json:"production_rates_per_day"`
+	ThumbnailID                *uuid.UUID `json:"thumbnail_id"`
+	YearFounded                int        `json:"year_founded" binding:"required"`
+	EmployeesCount             int        `json:"employees_count" binding:"required"`
+	BusinessType               string     `json:"business_type" binding:"required"`
+}
