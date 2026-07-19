@@ -13,7 +13,7 @@ type Blogs struct {
 	Tags                 []string   `json:"tags" gorm:"type:text[];not null"`
 	Content              string     `json:"content" gorm:"not null"`
 	Author               string     `json:"author" gorm:"not null"`
-	BlogReleaseDatetime  time.Time  `json:"blog_release_datetime" gorm:"not null"`
+	BlogWrittenDatetime  time.Time  `json:"blog_written_datetime" gorm:"not null"`
 	EstimatedMinutesRead int        `json:"estimated_minutes_read" gorm:"not null"`
 	ThumbnailID          *uuid.UUID `json:"thumbnail_id,omitempty"`
 	Thumbnail            *Images    `json:"thumbnail,omitempty" gorm:"foreignKey:ThumbnailID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:RESTRICT;"`
@@ -28,7 +28,7 @@ type CreateBlogs struct {
 	Tags                 []string         `json:"tags" binding:"required"`
 	Content              string           `json:"content" binding:"required"`
 	Author               string           `json:"author" binding:"required"`
-	BlogReleaseDatetime  time.Time        `json:"blog_release_datetime" binding:"required"`
+	BlogWrittenDatetime  time.Time        `json:"blog_written_datetime" binding:"required"`
 	EstimatedMinutesRead int              `json:"estimated_minutes_read" binding:"required"`
 	ThumbnailID          *uuid.UUID       `json:"thumbnail_id"`
 	Location             string           `json:"location"`
