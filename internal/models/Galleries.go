@@ -17,12 +17,3 @@ type CreateGalleries struct {
 	Slug        string    `json:"slug"`
 	ImageID     uuid.UUID `json:"image_id" binding:"required"`
 }
-
-type GetGalleries struct {
-	BaseModel
-	Name        string `json:"name"`
-	Description string `json:"description"`
-	Slug        string `json:"slug"`
-	ImageID     string `json:"image_id"`
-	Image       Images `json:"image"`
-}
