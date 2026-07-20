@@ -26,3 +26,23 @@ func ConnectDB() {
 	DB = database
 	log.Println("🎉 Success to connect database")
 }
+
+func DisconnectDB() {
+	if DB == nil {
+		return
+	}
+
+	sqlDB, err := DB.DB()
+	if err != nil {
+		log.Printf("❌ Failed to get sql.DB: %v", err)
+		return
+	}
+
+	err = sqlDB.Close()
+	if err != nil {
+		log.Printf("❌ Failed to close database connection: %v", err)
+		return
+	}
+
+	log.Println("🔌 Database connection closed")
+}

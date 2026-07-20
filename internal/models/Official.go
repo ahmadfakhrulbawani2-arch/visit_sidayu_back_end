@@ -29,3 +29,9 @@ type CreateOfficials struct {
 	RoleID         uuid.UUID  `json:"role_id" binding:"required"`
 	ProfileImageID *uuid.UUID `json:"profile_image_id"`
 }
+
+type CreateRoles struct {
+	Name        string `json:"name" binding:"required"`
+	Level       int    `json:"level" binding:"required"`
+	Description string `json:"description" binding:"required"`
+}
