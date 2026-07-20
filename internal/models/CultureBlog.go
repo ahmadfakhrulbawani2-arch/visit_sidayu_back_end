@@ -4,26 +4,27 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/lib/pq"
 )
 
-type CultureBlog struct {
+type CultureBlogs struct {
 	BaseModel
-	Title                    string     `json:"title" gorm:"not null"`
-	Description              string     `json:"description,omitempty"`
-	Content                  string     `json:"content" gorm:"not null"`
-	Tags                     []string   `json:"tags" gorm:"type:text[];not null"`
-	ThemeType                string     `json:"theme_type" gorm:"not null"`
-	ThumbnailID              *uuid.UUID `json:"thumbnail_id,omitempty"`
-	Thumbnail                *Images    `json:"thumbnail,omitempty" gorm:"foreignKey:ThumbnailID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:RESTRICT;"`
-	Location                 string     `json:"location,omitempty"`
-	Author                   string     `json:"author" gorm:"not null"`
-	BlogWrittenDatetime      time.Time  `json:"blog_written_datetime" gorm:"not null"`
-	EstimatedMinutesReadTime int        `json:"estimated_read_time" gorm:"not null"`
-	ExternalLinks            []string   `json:"external_links,omitempty" gorm:"type:text[]"`
-	Timeline                 *Timelines `json:"timeline,omitempty" gorm:"foreignKey:BlogID;references:ID;"`
+	Title                    string         `json:"title" gorm:"not null"`
+	Description              string         `json:"description,omitempty"`
+	Content                  string         `json:"content" gorm:"not null"`
+	Tags                     pq.StringArray `json:"tags" gorm:"type:text[];not null"`
+	ThemeType                string         `json:"theme_type" gorm:"not null"`
+	ThumbnailID              *uuid.UUID     `json:"thumbnail_id,omitempty"`
+	Thumbnail                *Images        `json:"thumbnail,omitempty" gorm:"foreignKey:ThumbnailID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:RESTRICT;"`
+	Location                 string         `json:"location,omitempty"`
+	Author                   string         `json:"author" gorm:"not null"`
+	BlogWrittenDatetime      time.Time      `json:"blog_written_datetime" gorm:"not null"`
+	EstimatedMinutesReadTime int            `json:"estimated_read_time" gorm:"not null"`
+	ExternalLinks            pq.StringArray `json:"external_links,omitempty" gorm:"type:text[]"`
+	Timeline                 *Timelines     `json:"timeline,omitempty" gorm:"foreignKey:BlogID;references:ID;"`
 }
 
-type CreateCultureBlogReq struct {
+type CreateCultureBlogsReq struct {
 	Title                    string           `json:"title" binding:"required"`
 	Description              string           `json:"description"`
 	Content                  string           `json:"content" binding:"required"`
