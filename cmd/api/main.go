@@ -17,6 +17,7 @@ func main() {
 		log.Fatal("Error loading .env file")
 	}
 	config.ConnectDB()
+	defer config.DisconnectDB()
 
 	server := gin.Default()
 

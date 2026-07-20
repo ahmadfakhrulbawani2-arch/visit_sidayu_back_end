@@ -6,7 +6,9 @@ import (
 	"fmt"
 	"log"
 	"os"
+	cln "simple_go_gin_gorm_postgres_be_template/db/clean"
 	"simple_go_gin_gorm_postgres_be_template/db/migrations"
+	"simple_go_gin_gorm_postgres_be_template/db/seeds"
 	"strings" // Tambahkan ini
 
 	"github.com/joho/godotenv"
@@ -16,6 +18,7 @@ func main() {
 	mgrtUp := flag.Bool("mgrt-up", false, "Jalankan database migration up")
 	mgrtDn := flag.Bool("mgrt-dn", false, "Jalankan database migration down")
 	seed := flag.Bool("seed", false, "Jalankan data seeder (coming soon)")
+	clean := flag.Bool("clean", false, "Bersihkan data tiap table pada database")
 	flag.Parse()
 
 	err := godotenv.Load()
@@ -50,7 +53,25 @@ func main() {
 	}
 
 	if *seed {
-		fmt.Println("ℹ️  Feature seed terpilih, namun belum diimplementasikan di migrations.")
+		seeds.Seeder()
+		os.Exit(0)
+	}
+
+	if *clean {
+		// --- Double Validation Start ---
+		fmt.Print("⚠️  WARNING: This action is IRREVERSIBLE. Are you sure you want to delete all of the database tables data? (y/N): ")
+		reader := bufio.NewReader(os.Stdin)
+		input, err := reader.ReadString('\n')
+		if err != nil {
+			log.Fatal("Error reading input")
+		}
+
+		input = strings.TrimSpace(strings.ToLower(input))
+		if input != "y" && input != "yes" {
+			fmt.Println("❌ Cleaning database cancelled.")
+			os.Exit(0)
+		}
+		cln.CleanAllTables()
 		os.Exit(0)
 	}
 
