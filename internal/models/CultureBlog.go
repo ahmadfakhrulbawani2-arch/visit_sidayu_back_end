@@ -21,7 +21,7 @@ type CultureBlogs struct {
 	BlogWrittenDatetime      time.Time      `json:"blog_written_datetime" gorm:"not null"`
 	EstimatedMinutesReadTime int            `json:"estimated_read_time" gorm:"not null"`
 	ExternalLinks            pq.StringArray `json:"external_links,omitempty" gorm:"type:text[]"`
-	Timeline                 *Timelines     `json:"timeline,omitempty" gorm:"foreignKey:BlogID;references:ID;"`
+	Timeline                 *Timelines     `json:"timeline,omitempty" gorm:"foreignKey:CultureBlogID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 }
 
 type CreateCultureBlogsReq struct {
@@ -36,5 +36,5 @@ type CreateCultureBlogsReq struct {
 	BlogWrittenDatetime      time.Time        `json:"blog_written_datetime" binding:"required"`
 	EstimatedMinutesReadTime int              `json:"estimated_read_time"`
 	ExternalLinks            []string         `json:"external_links"`
-	Timeline                 *CreateTimelines `json:"timeline"`
+	Timeline                 *CreateTimelines `json:"timeline" binding:"omitempty,dive"`
 }

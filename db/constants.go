@@ -15,4 +15,5 @@ var ModelsRegistry = []any{
 	&models.ShopsAndUmkmsBlogs{},
 	&models.Superadmins{},
 	&models.Timelines{},
+	&models.TimelinesElement{},
 }
