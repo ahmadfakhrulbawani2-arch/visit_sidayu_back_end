@@ -112,7 +112,30 @@ func All() []seed.Seed {
 					}(),
 					EstimatedMinutesReadTime: 15,
 					ExternalLinks:            nil,
-					Timeline:                 nil,
+					Timeline: &models.CreateTimelines{
+						Name:        "Timeline test blog",
+						Description: "timeline untuk test blog",
+						TimelineData: []models.CreateTimelinesElement{
+							{
+								Name: "Important event on culture 1",
+								TimelineDatetime: func() time.Time {
+									t, _ := time.Parse(time.RFC3339, "2026-07-20T09:41:48Z")
+									return t
+								}(),
+								Description:  "Keterangan event on culture 1",
+								ExternalLink: "https://google.com",
+							},
+							{
+								Name: "Important event on culture 2",
+								TimelineDatetime: func() time.Time {
+									t, _ := time.Parse(time.RFC3339, "2026-07-20T09:41:48Z")
+									return t
+								}(),
+								Description:  "Keterangan event on culture 2",
+								ExternalLink: "https://instagram.com",
+							},
+						},
+					},
 				})
 			},
 		},

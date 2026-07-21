@@ -20,7 +20,7 @@ type Blogs struct {
 	Thumbnail            *Images        `json:"thumbnail,omitempty" gorm:"foreignKey:ThumbnailID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:RESTRICT;"`
 	Location             string         `json:"location,omitempty"`
 	ExternalLinks        pq.StringArray `json:"external_links,omitempty" gorm:"type:text[]"`
-	Timeline             *Timelines     `json:"timeline,omitempty" gorm:"foreignKey:BlogID;references:ID;"`
+	Timeline             *Timelines     `json:"timeline,omitempty" gorm:"foreignKey:BlogID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 }
 
 type CreateBlogs struct {
@@ -34,5 +34,5 @@ type CreateBlogs struct {
 	ThumbnailID          *uuid.UUID       `json:"thumbnail_id"`
 	Location             string           `json:"location"`
 	ExternalLinks        []string         `json:"external_links"`
-	Timeline             *CreateTimelines `json:"timeline"`
+	Timeline             *CreateTimelines `json:"timeline" binding:"omitempty,dive"`
 }

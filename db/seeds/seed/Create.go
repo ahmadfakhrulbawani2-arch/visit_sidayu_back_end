@@ -4,6 +4,7 @@ import (
 	"simple_go_gin_gorm_postgres_be_template/internal/helpers"
 	"simple_go_gin_gorm_postgres_be_template/internal/models"
 
+	"github.com/google/uuid"
 	"github.com/jinzhu/copier"
 	"gorm.io/gorm"
 )
@@ -12,26 +13,41 @@ func CreateBlogs(db *gorm.DB, b models.CreateBlogs) error {
 	blog := b.ToModel()
 	tml := blog.Timeline
 	blog.Timeline = nil
-	if err := db.Debug().Create(&blog).Error; err != nil {
-		return err
-	}
-	if tml != nil {
-		tml.BlogID = blog.ID
 
-		if err := db.Debug().Create(tml).Error; err != nil {
+	return db.Transaction(func(tx *gorm.DB) error {
+		// Gunakan .Create(), JANGAN gunakan .Save() atau .FirstOrCreate()
+		if err := tx.Create(&blog).Error; err != nil {
 			return err
 		}
-	}
 
-	for i := range tml.TimelineData {
-		tml.TimelineData[i].TimelinesID = tml.ID
-	}
-	return db.Debug().Create(&tml.TimelineData).Error
+		if tml == nil {
+			return nil
+		}
+
+		tml.ID = uuid.Nil
+		tml.BlogID = &blog.ID
+		if err := tx.Create(tml).Error; err != nil {
+			return err
+		}
+
+		if len(tml.TimelineData) > 0 {
+			for i := range tml.TimelineData {
+				tml.TimelineData[i].TimelinesID = tml.ID
+			}
+			if err := tx.Create(&tml.TimelineData).Error; err != nil {
+				return err
+			}
+		}
+
+		return nil
+	})
 }
 
 func CreateCultureBlogs(db *gorm.DB, b models.CreateCultureBlogsReq) error {
 	culture := b.ToModel()
-	return db.Create(&culture).Error
+	return db.Transaction(func(tx *gorm.DB) error {
+		return tx.Create(&culture).Error
+	})
 }
 
 func CreateDemograhies(db *gorm.DB, d models.CreateDemographies) error {

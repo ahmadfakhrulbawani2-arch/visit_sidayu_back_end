@@ -9,7 +9,6 @@ import (
 // TimelinesElement
 type TimelinesElement struct {
 	BaseModel
-	ID               uuid.UUID `json:"ID" gorm:"primaryKey"`
 	Name             string    `json:"name" gorm:"not null"`
 	TimelineDatetime time.Time `json:"timeline_datetime" gorm:"not null"`
 	Description      string    `json:"description,omitempty"`
@@ -27,11 +26,13 @@ type CreateTimelinesElement struct {
 // Timelines
 type Timelines struct {
 	BaseModel
-	Name         string             `json:"name" gorm:"not null"`
-	Description  string             `json:"description,omitempty"`
-	BlogID       uuid.UUID          `json:"blog_id" gorm:"not null;uniqueIndex"`
-	Blog         *Blogs             `json:"-" gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
-	TimelineData []TimelinesElement `json:"timeline_data" gorm:"foreignKey:TimelinesID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+	Name          string             `json:"name" gorm:"not null"`
+	Description   string             `json:"description,omitempty"`
+	BlogID        *uuid.UUID         `json:"blog_id,omitempty" gorm:"uniqueIndex"`
+	CultureBlogID *uuid.UUID         `json:"culture_blog_id,omitempty" gorm:"uniqueIndex"`
+	Blog          *Blogs             `json:"blog,omitempty" gorm:"foreignKey:BlogID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+	CultureBlog   *CultureBlogs      `json:"culture_blog,omitempty" gorm:"foreignKey:CultureBlogID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+	TimelineData  []TimelinesElement `json:"timeline_data" gorm:"foreignKey:TimelinesID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 }
 
 type CreateTimelines struct {

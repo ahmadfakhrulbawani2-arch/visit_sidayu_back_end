@@ -45,10 +45,6 @@ func (CreateTimelines) TableName() string             { return "timelines" }
 func (b *CreateBlogs) ToModel() Blogs {
 	var timelineModel *Timelines
 	if b.Timeline != nil {
-		timelineModel = &Timelines{
-			Name:        b.Timeline.Name,
-			Description: b.Timeline.Description,
-		}
 		var elements []TimelinesElement
 		for _, el := range b.Timeline.TimelineData {
 			elements = append(elements, TimelinesElement{
@@ -58,7 +54,11 @@ func (b *CreateBlogs) ToModel() Blogs {
 				ExternalLink:     el.ExternalLink,
 			})
 		}
-		timelineModel.TimelineData = elements
+		timelineModel = &Timelines{
+			Name:         b.Timeline.Name,
+			Description:  b.Timeline.Description,
+			TimelineData: elements,
+		}
 	}
 
 	return Blogs{
