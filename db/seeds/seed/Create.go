@@ -1,45 +1,17 @@
 package seed
 
 import (
-	"simple_go_gin_gorm_postgres_be_template/internal/helpers"
-	"simple_go_gin_gorm_postgres_be_template/internal/models"
+	"visit-sidayu-backend/internal/helpers"
+	"visit-sidayu-backend/internal/models"
 
-	"github.com/google/uuid"
 	"github.com/jinzhu/copier"
 	"gorm.io/gorm"
 )
 
 func CreateBlogs(db *gorm.DB, b models.CreateBlogs) error {
 	blog := b.ToModel()
-	tml := blog.Timeline
-	blog.Timeline = nil
-
 	return db.Transaction(func(tx *gorm.DB) error {
-		// Gunakan .Create(), JANGAN gunakan .Save() atau .FirstOrCreate()
-		if err := tx.Create(&blog).Error; err != nil {
-			return err
-		}
-
-		if tml == nil {
-			return nil
-		}
-
-		tml.ID = uuid.Nil
-		tml.BlogID = &blog.ID
-		if err := tx.Create(tml).Error; err != nil {
-			return err
-		}
-
-		if len(tml.TimelineData) > 0 {
-			for i := range tml.TimelineData {
-				tml.TimelineData[i].TimelinesID = tml.ID
-			}
-			if err := tx.Create(&tml.TimelineData).Error; err != nil {
-				return err
-			}
-		}
-
-		return nil
+		return tx.Create(&blog).Error
 	})
 }
 
