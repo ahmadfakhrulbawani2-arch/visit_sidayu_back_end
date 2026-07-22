@@ -71,14 +71,14 @@ func main() {
 		img_api := V1_api.Group("/images")
 		{
 			img_api.GET("/", ctr.GetImages)
-			img_api.GET("/:id", ctr.GetImageById)
+			img_api.GET("/id/:id", ctr.GetImageById)
 		}
 
 		blog_api := V1_api.Group("/blogs")
 		{
 			blog_api.GET("/", ctr.GetAllBlogs)
-			blog_api.GET("/:id", ctr.GetBlogById)
-			blog_api.GET("/:slug", ctr.GetBlogBySlug)
+			blog_api.GET("/id/:id", ctr.GetBlogById)
+			blog_api.GET("/slug/:slug", ctr.GetBlogBySlug)
 		}
 
 		protected := V1_api.Group("/")
@@ -86,24 +86,24 @@ func main() {
 		{
 			sa_api := protected.Group("/superadmins")
 			{
-				sa_api.GET("/me", ctr.SuperadminCurrent)    // ✅
-				sa_api.GET("/", ctr.GetAllSuperadmins)      // ✅
-				sa_api.GET("/:id", ctr.GetSuperadminByID)   // ✅
-				sa_api.PATCH("/:id", ctr.UpdateSuperadmin)  // ✅
-				sa_api.DELETE("/:id", ctr.DeleteSuperadmin) // ✅
+				sa_api.GET("/me", ctr.SuperadminCurrent)       // ✅
+				sa_api.GET("/", ctr.GetAllSuperadmins)         // ✅
+				sa_api.GET("/id/:id", ctr.GetSuperadminByID)   // ✅
+				sa_api.PATCH("/id/:id", ctr.UpdateSuperadmin)  // ✅
+				sa_api.DELETE("/id/:id", ctr.DeleteSuperadmin) // ✅
 			}
 			img_api := protected.Group("/images")
 			{
 				img_api.POST("/", ctr.UploadImage)
-				img_api.PUT("/:id", ctr.UpdateImage)
-				img_api.DELETE("/:id", ctr.DeleteImage)
+				img_api.PUT("/id/:id", ctr.UpdateImage)
+				img_api.DELETE("/id/:id", ctr.DeleteImage)
 			}
 
-			blog_api := V1_api.Group("/blogs")
+			blog_api := protected.Group("/blogs")
 			{
 				blog_api.POST("/", ctr.CreateBlog)
-				blog_api.PATCH("/", ctr.UpdateBlog)
-				blog_api.DELETE("/:id", ctr.DeleteBlog)
+				blog_api.PATCH("/id/:id", ctr.UpdateBlog)
+				blog_api.DELETE("/id/:id", ctr.DeleteBlog)
 			}
 		}
 	}

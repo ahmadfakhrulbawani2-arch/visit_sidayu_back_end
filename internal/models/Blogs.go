@@ -35,7 +35,7 @@ type CreateBlogs struct {
 	ThumbnailID          *uuid.UUID       `json:"thumbnail_id"`
 	Location             string           `json:"location"`
 	ExternalLinks        []string         `json:"external_links"`
-	Timeline             *CreateTimelines `json:"timeline" binding:"omitempty,dive"`
+	Timeline             *CreateTimelines `json:"timeline" binding:"omitempty"`
 }
 
 type UpdateBlogs struct {
@@ -49,5 +49,5 @@ type UpdateBlogs struct {
 	ThumbnailID          *uuid.UUID       `json:"thumbnail_id"`
 	Location             *string          `json:"location"`
 	ExternalLinks        []string         `json:"external_links"`
-	Timeline             *CreateTimelines `json:"timeline" binding:"omitempty,dive"`
+	Timeline             *CreateTimelines `json:"timeline" binding:"omitempty"`
 }

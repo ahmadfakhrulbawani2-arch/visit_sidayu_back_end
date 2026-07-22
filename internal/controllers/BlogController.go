@@ -161,7 +161,7 @@ func UpdateBlog(ctx *gin.Context) {
 	copier.CopyWithOption(&blog, &input, copier.Option{IgnoreEmpty: true, DeepCopy: true})
 
 	if input.Title != nil {
-		hp.GenerateSlugWithTimestamp(blog.Title, blog)
+		hp.GenerateSlugWithTimestamp(blog.Title, &blog)
 	}
 
 	if err := cfg.DB.Save(&blog).Error; err != nil {
