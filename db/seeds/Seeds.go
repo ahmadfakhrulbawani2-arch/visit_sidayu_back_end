@@ -1,9 +1,9 @@
 package seeds
 
 import (
-	"simple_go_gin_gorm_postgres_be_template/db/seeds/seed"
-	"simple_go_gin_gorm_postgres_be_template/internal/models"
 	"time"
+	"visit-sidayu-backend/db/seeds/seed"
+	"visit-sidayu-backend/internal/models"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"

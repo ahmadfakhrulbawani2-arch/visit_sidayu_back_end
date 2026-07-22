@@ -9,14 +9,14 @@ import (
 
 // GetUserIDFromCtx mengambil user_id dari Gin Context dan mem-parsing-nya menjadi uuid.UUID.
 func GetUserIDFromCtx(ctx *gin.Context) (uuid.UUID, error) {
-	userIdInterface, exists := ctx.Get("user_id")
+	userIdInterface, exists := ctx.Get("sa_id")
 	if !exists {
-		return uuid.Nil, fmt.Errorf("user_id not found in context")
+		return uuid.Nil, fmt.Errorf("sa_id not found in context")
 	}
 
 	userIdStr, ok := userIdInterface.(string)
 	if !ok {
-		return uuid.Nil, fmt.Errorf("user_id in context is not a string")
+		return uuid.Nil, fmt.Errorf("sa_id in context is not a string")
 	}
 
 	parsedUUID, err := uuid.Parse(userIdStr)

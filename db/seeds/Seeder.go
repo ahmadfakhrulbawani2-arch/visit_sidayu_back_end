@@ -2,7 +2,7 @@ package seeds
 
 import (
 	"log"
-	cfg "simple_go_gin_gorm_postgres_be_template/internal/config"
+	cfg "visit-sidayu-backend/internal/config"
 
 	"github.com/joho/godotenv"
 )

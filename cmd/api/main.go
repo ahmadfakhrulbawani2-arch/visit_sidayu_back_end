@@ -4,8 +4,9 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"simple_go_gin_gorm_postgres_be_template/internal/config"
-	"simple_go_gin_gorm_postgres_be_template/internal/middlewares"
+	"visit-sidayu-backend/internal/config"
+	ctr "visit-sidayu-backend/internal/controllers"
+	mdw "visit-sidayu-backend/internal/middlewares"
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -48,24 +49,37 @@ func main() {
 
 	V1_api := server.Group("/api/v1")
 	{
-		// events
+		// superadmin
+		sa_api := V1_api.Group("/superadmins/auth")
+		{
+			// auth
+			sa_api.POST("/register", ctr.SuperAdminRegister) // ✅
+			sa_api.POST("/login", ctr.SuperadminLogin) // ✅
+		}
 
-		// /events?search=&page=&limit=
-		// V1_api.GET("/events", controllers.GetEvents)
-		// V1_api.GET("/events/:id", controllers.GetEventById)
-
-		// user
-		// V1_api.POST("/auth/register", controllers.RegisterUser)
-		// V1_api.POST("/auth/login", controllers.UserLogin)
+		img_api := V1_api.Group("/images")
+		{
+			img_api.GET("/", ctr.GetImages) 
+			img_api.GET("/:id", ctr.GetImageById) 
+		}
 
 		protected := V1_api.Group("/")
-		protected.Use(middlewares.RequiredAuth())
+		protected.Use(mdw.RequiredAuth()) // ✅
 		{
-			// protected.GET("/auth/me", controllers.GetCurrentUser)
-			// protected.POST("/events", controllers.CreateEvent)
-			// protected.PUT("/events/:id", controllers.UpdateEvent)
-			// protected.DELETE("/events/:id", controllers.DeleteEvent)
-			// protected.POST("/images", controllers.UploadImage)
+			sa_api := protected.Group("/superadmins")
+			{
+				sa_api.GET("/me", ctr.SuperadminCurrent) // ✅
+				sa_api.GET("/", ctr.GetAllSuperadmins) // ✅
+				sa_api.GET("/:id", ctr.GetSuperadminByID) // ✅
+				sa_api.PATCH("/:id", ctr.UpdateSuperadmin) // ✅
+				sa_api.DELETE("/:id", ctr.DeleteSuperadmin) // .✅
+			}
+			img_api := protected.Group("/images")
+			{
+				img_api.POST("/", ctr.UploadImage) 
+				img_api.PUT("/:id", ctr.UpdateImage)
+				img_api.DELETE("/:id", ctr.DeleteImage)
+			}
 		}
 	}
 

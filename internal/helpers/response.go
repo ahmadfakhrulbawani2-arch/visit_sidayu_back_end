@@ -7,12 +7,12 @@ import (
 )
 
 type SuccessResponseHeader struct {
-	Success    bool        `json:"succes"`
-	StatusCode int         `json:"status_code"`
-	Message    string      `json:"message"`
-	Data       interface{} `json:"data"`
-	JwtToken   string      `json:"jwt_token,omitempty"`
-	Meta       interface{} `json:"meta"`
+	Success    bool   `json:"succes"`
+	StatusCode int    `json:"status_code"`
+	Message    string `json:"message"`
+	Data       any    `json:"data"`
+	JwtToken   string `json:"jwt_token,omitempty"`
+	Meta       any    `json:"meta,omitempty"`
 }
 
 type ErrorResponseHeader struct {
@@ -22,7 +22,7 @@ type ErrorResponseHeader struct {
 	Error      string `json:"error"`
 }
 
-func RespSuccess(ctx *gin.Context, statusCode int, message string, data interface{}, jwtToken string, meta interface{}) {
+func RespSuccess(ctx *gin.Context, statusCode int, message string, data any, jwtToken string, meta any) {
 	ctx.Header("Content-Type", "application/json")
 
 	ctx.JSON(statusCode, SuccessResponseHeader{

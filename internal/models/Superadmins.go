@@ -8,12 +8,18 @@ type Superadmins struct {
 }
 
 type SuperadminsLoginPayload struct {
-	Username string `json:"username" binding:"required"`
-	Password string `json:"password" binding:"required,min=8"`
+	Identity string `json:"identity" binding:"required"`
+	Password string `json:"password" binding:"required"`
 }
 
 type CreateSuperadmins struct {
 	Username string `json:"username" binding:"required"`
 	Password string `json:"password" binding:"required,min=8"`
 	Email    string `json:"email" binding:"required,email"`
+}
+
+type UpdateSuperadminDTO struct {
+	Username    *string `json:"username"`
+	Password    string  `json:"password" binding:"required"`
+	NewPassword *string `json:"new_password"`
 }

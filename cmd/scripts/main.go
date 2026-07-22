@@ -6,10 +6,10 @@ import (
 	"fmt"
 	"log"
 	"os"
-	cln "simple_go_gin_gorm_postgres_be_template/db/clean"
-	"simple_go_gin_gorm_postgres_be_template/db/migrations"
-	"simple_go_gin_gorm_postgres_be_template/db/seeds"
 	"strings" // Tambahkan ini
+	cln "visit-sidayu-backend/db/clean"
+	"visit-sidayu-backend/db/migrations"
+	"visit-sidayu-backend/db/seeds"
 
 	"github.com/joho/godotenv"
 )

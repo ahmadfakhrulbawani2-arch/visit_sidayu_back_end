@@ -1,6 +1,6 @@
 package db
 
-import "simple_go_gin_gorm_postgres_be_template/internal/models"
+import "visit-sidayu-backend/internal/models"
 
 var ModelsRegistry = []any{
 	&models.Blogs{},
