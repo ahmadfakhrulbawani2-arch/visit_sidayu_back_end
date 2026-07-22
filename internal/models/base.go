@@ -39,6 +39,7 @@ func (CreateOfficials) TableName() string             { return "officials" }
 func (CreateRoles) TableName() string                 { return "roles" }
 func (CreateShopsAndUmkmsBlogsReq) TableName() string { return "shops_and_umkms_blogs" }
 func (CreateSuperadmins) TableName() string           { return "superadmins" }
+func (Superadmins) TableName() string                 { return "superadmins" }
 func (CreateTimelines) TableName() string             { return "timelines" }
 
 // add table insert mapping
