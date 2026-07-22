@@ -10,6 +10,7 @@ import (
 type Blogs struct {
 	BaseModel
 	Title                string         `json:"title" gorm:"not null"`
+	Slug                 string         `json:"slug" gorm:"unique;not null"`
 	Description          string         `json:"description,omitempty"`
 	Tags                 pq.StringArray `json:"tags" gorm:"type:text[];not null"`
 	Content              string         `json:"content" gorm:"not null"`
@@ -33,6 +34,20 @@ type CreateBlogs struct {
 	EstimatedMinutesRead int              `json:"estimated_minutes_read" binding:"required"`
 	ThumbnailID          *uuid.UUID       `json:"thumbnail_id"`
 	Location             string           `json:"location"`
+	ExternalLinks        []string         `json:"external_links"`
+	Timeline             *CreateTimelines `json:"timeline" binding:"omitempty,dive"`
+}
+
+type UpdateBlogs struct {
+	Title                *string          `json:"title"`
+	Description          *string          `json:"description"`
+	Tags                 []string         `json:"tags"`
+	Content              *string          `json:"content"`
+	Author               *string          `json:"author"`
+	BlogWrittenDatetime  *time.Time       `json:"blog_written_datetime"`
+	EstimatedMinutesRead *int             `json:"estimated_minutes_read"`
+	ThumbnailID          *uuid.UUID       `json:"thumbnail_id"`
+	Location             *string          `json:"location"`
 	ExternalLinks        []string         `json:"external_links"`
 	Timeline             *CreateTimelines `json:"timeline" binding:"omitempty,dive"`
 }

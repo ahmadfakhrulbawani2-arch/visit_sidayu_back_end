@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"net/http"
 	"os"
 	"visit-sidayu-backend/internal/config"
 	ctr "visit-sidayu-backend/internal/controllers"
@@ -49,18 +50,35 @@ func main() {
 
 	V1_api := server.Group("/api/v1")
 	{
+		// health
+		V1_api.GET("/ping", func(ctx *gin.Context) {
+			ctx.Header("Content-Type", "application/json")
+
+			ctx.JSON(http.StatusOK, gin.H{
+				"status":  200,
+				"message": "pong",
+			})
+		})
+
 		// superadmin
 		sa_api := V1_api.Group("/superadmins/auth")
 		{
 			// auth
 			sa_api.POST("/register", ctr.SuperAdminRegister) // ✅
-			sa_api.POST("/login", ctr.SuperadminLogin) // ✅
+			sa_api.POST("/login", ctr.SuperadminLogin)       // ✅
 		}
 
 		img_api := V1_api.Group("/images")
 		{
-			img_api.GET("/", ctr.GetImages) 
-			img_api.GET("/:id", ctr.GetImageById) 
+			img_api.GET("/", ctr.GetImages)
+			img_api.GET("/:id", ctr.GetImageById)
+		}
+
+		blog_api := V1_api.Group("/blogs")
+		{
+			blog_api.GET("/", ctr.GetAllBlogs)
+			blog_api.GET("/:id", ctr.GetBlogById)
+			blog_api.GET("/:slug", ctr.GetBlogBySlug)
 		}
 
 		protected := V1_api.Group("/")
@@ -68,17 +86,24 @@ func main() {
 		{
 			sa_api := protected.Group("/superadmins")
 			{
-				sa_api.GET("/me", ctr.SuperadminCurrent) // ✅
-				sa_api.GET("/", ctr.GetAllSuperadmins) // ✅
-				sa_api.GET("/:id", ctr.GetSuperadminByID) // ✅
-				sa_api.PATCH("/:id", ctr.UpdateSuperadmin) // ✅
-				sa_api.DELETE("/:id", ctr.DeleteSuperadmin) // .✅
+				sa_api.GET("/me", ctr.SuperadminCurrent)    // ✅
+				sa_api.GET("/", ctr.GetAllSuperadmins)      // ✅
+				sa_api.GET("/:id", ctr.GetSuperadminByID)   // ✅
+				sa_api.PATCH("/:id", ctr.UpdateSuperadmin)  // ✅
+				sa_api.DELETE("/:id", ctr.DeleteSuperadmin) // ✅
 			}
 			img_api := protected.Group("/images")
 			{
-				img_api.POST("/", ctr.UploadImage) 
+				img_api.POST("/", ctr.UploadImage)
 				img_api.PUT("/:id", ctr.UpdateImage)
 				img_api.DELETE("/:id", ctr.DeleteImage)
+			}
+
+			blog_api := V1_api.Group("/blogs")
+			{
+				blog_api.POST("/", ctr.CreateBlog)
+				blog_api.PATCH("/", ctr.UpdateBlog)
+				blog_api.DELETE("/:id", ctr.DeleteBlog)
 			}
 		}
 	}
