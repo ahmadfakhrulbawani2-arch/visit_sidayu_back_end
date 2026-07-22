@@ -27,7 +27,6 @@ func RequiredAuth() gin.HandlerFunc {
 			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 				return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 			}
-
 			return []byte(os.Getenv("JWT_SECRET")), nil
 		})
 
@@ -37,7 +36,7 @@ func RequiredAuth() gin.HandlerFunc {
 		}
 
 		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-			ctx.Set("user_id", claims["sub"].(string))
+			ctx.Set("sa_id", claims["sub"].(string))
 			ctx.Next()
 		} else {
 			ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
@@ -46,6 +45,7 @@ func RequiredAuth() gin.HandlerFunc {
 				"message":     "Access denied, token is valid by format but failed in JWT validation, the token is probably expired, try to relogin",
 				"error":       "Unauthorized action detected, JWT validation failed",
 			})
+			return
 		}
 	}
 }
