@@ -3,17 +3,21 @@ package db
 import "visit-sidayu-backend/internal/models"
 
 var ModelsRegistry = []any{
+	&models.Roles{},
+	&models.Officials{},
+
+	&models.Images{},
+
 	&models.Blogs{},
 	&models.CultureBlogs{},
-	&models.Demographies{},
-	&models.Galleries{},
-	&models.Geographies{},
-	&models.Images{},
 	&models.IndustriesBlogs{},
-	&models.Officials{},
-	&models.Roles{},
 	&models.ShopsAndUmkmsBlogs{},
-	&models.Superadmins{},
+
 	&models.Timelines{},
 	&models.TimelinesElement{},
+
+	&models.Galleries{},
+	&models.Geographies{},
+	&models.Demographies{},
+	&models.Superadmins{},
 }

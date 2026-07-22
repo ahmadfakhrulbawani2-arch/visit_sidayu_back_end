@@ -2,6 +2,7 @@ package seed
 
 import (
 	"visit-sidayu-backend/internal/helpers"
+	hp "visit-sidayu-backend/internal/helpers"
 	"visit-sidayu-backend/internal/models"
 
 	"github.com/jinzhu/copier"
@@ -10,6 +11,7 @@ import (
 
 func CreateBlogs(db *gorm.DB, b models.CreateBlogs) error {
 	blog := b.ToModel()
+	hp.GenerateSlugWithTimestamp(blog.Title, &blog)
 	return db.Transaction(func(tx *gorm.DB) error {
 		return tx.Create(&blog).Error
 	})
