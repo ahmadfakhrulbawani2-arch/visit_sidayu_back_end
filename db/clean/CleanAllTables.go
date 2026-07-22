@@ -2,10 +2,10 @@ package clean
 
 import (
 	"log"
-	"simple_go_gin_gorm_postgres_be_template/db"
 	"slices"
+	"visit-sidayu-backend/db"
 
-	cfg "simple_go_gin_gorm_postgres_be_template/internal/config"
+	cfg "visit-sidayu-backend/internal/config"
 
 	"github.com/joho/godotenv"
 )
