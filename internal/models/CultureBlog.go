@@ -10,6 +10,7 @@ import (
 type CultureBlogs struct {
 	BaseModel
 	Title                    string         `json:"title" gorm:"not null"`
+	Slug                     string         `json:"slug" gorm:"unique;not null"`
 	Description              string         `json:"description,omitempty"`
 	Content                  string         `json:"content" gorm:"not null"`
 	Tags                     pq.StringArray `json:"tags" gorm:"type:text[];not null"`
@@ -36,5 +37,20 @@ type CreateCultureBlogsReq struct {
 	BlogWrittenDatetime      time.Time        `json:"blog_written_datetime" binding:"required"`
 	EstimatedMinutesReadTime int              `json:"estimated_read_time"`
 	ExternalLinks            []string         `json:"external_links"`
-	Timeline                 *CreateTimelines `json:"timeline" binding:"omitempty,dive"`
+	Timeline                 *CreateTimelines `json:"timeline" binding:"omitempty"`
+}
+
+type UpdateCultureBlogsReq struct {
+	Title                    *string          `json:"title"`
+	Description              *string          `json:"description"`
+	Content                  *string          `json:"content"`
+	Tags                     []string         `json:"tags"`
+	ThemeType                *string          `json:"theme_type"`
+	ThumbnailID              *uuid.UUID       `json:"thumbnail_id"`
+	Location                 *string          `json:"location"`
+	Author                   *string          `json:"author"`
+	BlogWrittenDatetime      *time.Time       `json:"blog_written_datetime"`
+	EstimatedMinutesReadTime *int             `json:"estimated_read_time"`
+	ExternalLinks            []string         `json:"external_links"`
+	Timeline                 *CreateTimelines `json:"timeline" binding:"omitempty"`
 }
