@@ -76,9 +76,16 @@ func main() {
 
 		blog_api := V1_api.Group("/blogs")
 		{
-			blog_api.GET("/", ctr.GetAllBlogs)
-			blog_api.GET("/id/:id", ctr.GetBlogById)
-			blog_api.GET("/slug/:slug", ctr.GetBlogBySlug)
+			blog_api.GET("/", ctr.GetAllBlogs)             // ✅
+			blog_api.GET("/id/:id", ctr.GetBlogById)       // ✅
+			blog_api.GET("/slug/:slug", ctr.GetBlogBySlug) // ✅
+		}
+
+		cb_api := V1_api.Group("/culture-blogs")
+		{
+			cb_api.GET("/", ctr.GetAllCultureBlog)
+			cb_api.GET("/id/:id", ctr.GetCultureBlogById)
+			cb_api.GET("slug/:slug", ctr.GetCultureBlogBySlug)
 		}
 
 		protected := V1_api.Group("/")
@@ -101,9 +108,16 @@ func main() {
 
 			blog_api := protected.Group("/blogs")
 			{
-				blog_api.POST("/", ctr.CreateBlog)
-				blog_api.PATCH("/id/:id", ctr.UpdateBlog)
-				blog_api.DELETE("/id/:id", ctr.DeleteBlog)
+				blog_api.POST("/", ctr.CreateBlog)         // ✅
+				blog_api.PATCH("/id/:id", ctr.UpdateBlog)  // ✅
+				blog_api.DELETE("/id/:id", ctr.DeleteBlog) // ✅
+			}
+
+			cb_api := protected.Group("/culture-blogs")
+			{
+				cb_api.POST("/", ctr.CreateCultureBlog)
+				cb_api.PATCH("/id/:id", ctr.UpdateCultureBlog)
+				cb_api.DELETE("/id/:id", ctr.DeleteCultureBlog)
 			}
 		}
 	}

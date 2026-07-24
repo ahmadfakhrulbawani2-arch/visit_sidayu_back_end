@@ -19,6 +19,7 @@ func CreateBlogs(db *gorm.DB, b models.CreateBlogs) error {
 
 func CreateCultureBlogs(db *gorm.DB, b models.CreateCultureBlogsReq) error {
 	culture := b.ToModel()
+	hp.GenerateSlugWithTimestamp(culture.Title, &culture)
 	return db.Transaction(func(tx *gorm.DB) error {
 		return tx.Create(&culture).Error
 	})
