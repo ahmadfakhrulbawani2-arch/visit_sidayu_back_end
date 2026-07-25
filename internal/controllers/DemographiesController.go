@@ -4,6 +4,7 @@ import (
 	"errors"
 	"net/http"
 	cfg "visit-sidayu-backend/internal/config"
+	"visit-sidayu-backend/internal/constants/errorss"
 	myE "visit-sidayu-backend/internal/constants/errorss"
 	hp "visit-sidayu-backend/internal/helpers"
 	"visit-sidayu-backend/internal/models"
@@ -80,6 +81,8 @@ func CreateDemography(ctx *gin.Context) {
 		return
 	}
 
+	totalPopulation := input.MalePopulation + input.FemalePopulation
+
 	var created models.Demographies
 	errCreated := cfg.DB.Where("village_name = ?", input.VillageName).First(&created).Error
 	if errCreated == nil {
@@ -89,6 +92,22 @@ func CreateDemography(ctx *gin.Context) {
 
 	var demography models.Demographies
 	copier.Copy(&demography, &input)
+
+	var geo models.Geographies
+	err = cfg.DB.Where("village_name = ?", input.VillageName).Select("area", "area_unit").First(&geo).Error
+	if err != nil {
+		hp.RespError(ctx, http.StatusInternalServerError, "Village geography data not found", err)
+		return
+	}
+
+	populationDensity, unit, errPopDen := hp.CalcPopulationDensity(totalPopulation, geo.Area, geo.AreaUnit)
+	if errPopDen != nil {
+		hp.RespError(ctx, http.StatusInternalServerError, "Server failed to calculate population density", err)
+		return
+	}
+
+	demography.PopulationDensity = populationDensity
+	demography.PopulationDensityUnit = unit
 
 	err = cfg.DB.Create(&demography).Error
 	if err != nil {
@@ -141,8 +160,6 @@ func UpdateDemography(ctx *gin.Context) {
 		input.DemographyDataYear != nil ||
 		input.MalePopulation != nil ||
 		input.FemalePopulation != nil ||
-		input.TotalPopulation != nil ||
-		input.PopulationDensityUnit != nil ||
 		input.FamiliesNumber != nil ||
 		input.NumberOfBirth != nil ||
 		input.NumberOfDeath != nil ||
@@ -158,7 +175,39 @@ func UpdateDemography(ctx *gin.Context) {
 		return
 	}
 
+	var geo models.Geographies
+	err = cfg.DB.Where("village_name = ?", input.VillageName).Select("area", "area_unit").First(&geo).Error
+	if err != nil {
+		hp.RespError(ctx, http.StatusInternalServerError, "Village geography data not found", err)
+		return
+	}
+
 	copier.CopyWithOption(&demography, &input, copier.Option{IgnoreEmpty: true, DeepCopy: true})
+
+	var newTotalPopulation int
+	var newPopulationDensity float64
+	var unit string
+	if input.FemalePopulation != nil || input.MalePopulation != nil {
+
+		malePop := demography.MalePopulation
+		if input.MalePopulation != nil {
+			malePop = *input.MalePopulation
+		}
+
+		femalePop := demography.FemalePopulation
+		if input.FemalePopulation != nil {
+			femalePop = *input.FemalePopulation
+		}
+
+		newTotalPopulation = malePop + femalePop
+		newPopulationDensity, unit, err = hp.CalcPopulationDensity(newTotalPopulation, geo.Area, geo.AreaUnit)
+		if err != nil {
+			hp.RespError(ctx, http.StatusInternalServerError, errorss.MsgSvrErr, err)
+		}
+	}
+
+	demography.PopulationDensity = newPopulationDensity
+	demography.PopulationDensityUnit = unit
 
 	err = cfg.DB.Save(&demography).Error
 	if err != nil {
