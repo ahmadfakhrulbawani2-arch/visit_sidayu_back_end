@@ -88,6 +88,49 @@ func main() {
 			cb_api.GET("slug/:slug", ctr.GetCultureBlogBySlug)
 		}
 
+		d_api := V1_api.Group("/demographies")
+		{
+			d_api.GET("/", ctr.GetAllDemographies)
+			d_api.GET("/id/:id", ctr.GetDemographyById)
+			d_api.GET("/district", ctr.GetDistrictDemography)
+		}
+
+		g_api := V1_api.Group("/galleries")
+		{
+			g_api.GET("/", ctr.GetAllGalleries)
+			g_api.GET("/id/:id", ctr.GetGalleryByID)
+		}
+
+		geo_api := V1_api.Group("/geographies")
+		{
+			geo_api.GET("/", ctr.GetAllGeographies)
+			geo_api.GET("/id/:id", ctr.GetGeographyByID)
+		}
+
+		ind_api := V1_api.Group("/industries-blogs")
+		{
+			ind_api.GET("/", ctr.GetAllIndustriesBlog)
+			ind_api.GET("/id/:id", ctr.GetIndustryBlogByID)
+		}
+
+		ofc_api := V1_api.Group("/officials")
+		{
+			ofc_api.GET("/", ctr.GetAllOfficials)
+			ofc_api.GET("/id/:id", ctr.GetOfficialByID)
+		}
+
+		si_api := V1_api.Group("/shops-umkms")
+		{
+			si_api.GET("/", ctr.GetAllShopsAndUmkms)
+			si_api.GET("/id/:id", ctr.GetShopAndUmkmByID)
+		}
+
+		tm_api := V1_api.Group("/timelines")
+		{
+			tm_api.GET("/", ctr.GetAllTimelines)
+			tm_api.GET("/id/:id", ctr.GetTimelineByID)
+		}
+
 		protected := V1_api.Group("/")
 		protected.Use(mdw.RequiredAuth()) // ✅
 		{
@@ -119,6 +162,56 @@ func main() {
 				cb_api.PATCH("/id/:id", ctr.UpdateCultureBlog)
 				cb_api.DELETE("/id/:id", ctr.DeleteCultureBlog)
 			}
+
+			d_api := protected.Group("/demographies")
+			{
+				d_api.POST("/", ctr.CreateDemography)
+				d_api.PATCH("/id/:id", ctr.UpdateDemography)
+				d_api.DELETE("/id/:id", ctr.DeleteDemography)
+			}
+
+			g_api := protected.Group("/galleries")
+			{
+				g_api.POST("/", ctr.CreateGallery)
+				g_api.PATCH("/id/:id", ctr.UpdateGallery)
+				g_api.DELETE("/id/:id", ctr.DeleteGallery)
+			}
+
+			geo_api := protected.Group("/geographies")
+			{
+				geo_api.POST("/", ctr.CreateGeography)
+				geo_api.PATCH("/id/:id", ctr.UpdateGeography)
+				geo_api.DELETE("/id/:id", ctr.DeleteGeograhy)
+			}
+
+			ind_api := protected.Group("/industries-blogs")
+			{
+				ind_api.POST("/", ctr.CreateIndustryBlog)
+				ind_api.PATCH("/id/:id", ctr.UpdateIndustryBlog)
+				ind_api.DELETE("/id/:id", ctr.DeleteIndustryBlog)
+			}
+
+			ofc_api := V1_api.Group("/officials")
+			{
+				ofc_api.POST("/", ctr.CreateOfficial)
+				ofc_api.PATCH("/id/:id", ctr.UpdateOfficial)
+				ofc_api.DELETE("/id/:id", ctr.DeleteOfficial)
+			}
+
+			si_api := V1_api.Group("/shops-umkms")
+			{
+				si_api.POST("/", ctr.CreateShopAndUmkm)
+				si_api.PATCH("/id/:id", ctr.UpdateShopAndUmkm)
+				si_api.DELETE("/id/:id", ctr.DeleteShopAndUmkm)
+			}
+
+			tm_api := V1_api.Group("/timelines")
+			{
+				tm_api.POST("/", ctr.CreateTimeline)
+				tm_api.PATCH("/id/:id", ctr.UpdateTimeline)
+				tm_api.DELETE("/id/:id", ctr.DeleteTimeline)
+			}
+
 		}
 	}
 

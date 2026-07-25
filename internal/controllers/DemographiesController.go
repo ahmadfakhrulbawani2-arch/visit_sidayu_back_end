@@ -255,3 +255,6 @@ func DeleteDemography(ctx *gin.Context) {
 }
 
 // --- For Geography card & Overview
+func GetDistrictDemography(ctx *gin.Context) {
+
+}
