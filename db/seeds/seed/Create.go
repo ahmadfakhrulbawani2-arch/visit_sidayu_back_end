@@ -1,6 +1,7 @@
 package seed
 
 import (
+	"errors"
 	"visit-sidayu-backend/internal/helpers"
 	hp "visit-sidayu-backend/internal/helpers"
 	"visit-sidayu-backend/internal/models"
@@ -28,6 +29,24 @@ func CreateCultureBlogs(db *gorm.DB, b models.CreateCultureBlogsReq) error {
 func CreateDemograhies(db *gorm.DB, d models.CreateDemographies) error {
 	var demo models.Demographies
 	copier.Copy(&demo, &d)
+	demo.TotalPopulation = demo.MalePopulation + demo.FemalePopulation
+	var villageGeographies models.Geographies
+	err := db.Where("village_name = ?", demo.VillageName).Select("area", "area_unit").First(&villageGeographies).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return db.Create(&demo).Error
+		}
+		return err
+	}
+
+	density, unit, err := hp.CalcPopulationDensity(demo.TotalPopulation, villageGeographies.Area, villageGeographies.AreaUnit)
+	if err != nil {
+		return err
+	}
+
+	demo.PopulationDensity = density
+	demo.PopulationDensityUnit = unit
+
 	return db.Create(&demo).Error
 }
 
