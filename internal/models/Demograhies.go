@@ -46,3 +46,21 @@ type GetDistrictDemographies struct {
 	PopulationDensityUnit string   `json:"population_density_unit"`
 	Sources               []string `json:"sources"`
 }
+
+type UpdateDemographies struct {
+	VillageName            *string `json:"village_name"`
+	DemographyDataYear     *int    `json:"demography_data_year"`
+	MalePopulation         *int    `json:"male_population"`
+	FemalePopulation       *int    `json:"female_population"`
+	TotalPopulation        *int    `json:"total_population"`
+	PopulationDensityUnit  *string `json:"population_density_unit"`
+	FamiliesNumber         *int    `json:"families_number"`
+	NumberOfBirth          *int    `json:"number_of_birth"`
+	NumberOfDeath          *int    `json:"number_of_death"`
+	WorkingPopulation      *int    `json:"working_population"`
+	UnemployedPopulation   *int    `json:"unemployed_population"`
+	HousekeepingPopulation *int    `json:"housekeeping_population"`
+	StudentPopulation      *int    `json:"student_population"`
+	SourceName             *string `json:"source_name"`
+	ExternalLinkSource     *string `json:"external_link_source"`
+}
