@@ -7,17 +7,17 @@ import (
 	"visit-sidayu-backend/internal/constants/errorss"
 	myE "visit-sidayu-backend/internal/constants/errorss"
 	hp "visit-sidayu-backend/internal/helpers"
+	"visit-sidayu-backend/internal/helpers/validation"
 	"visit-sidayu-backend/internal/models"
 
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 	"github.com/jinzhu/copier"
 	"gorm.io/gorm"
 )
 
 var (
-	singularName = "Demography"
-	pluralName   = "Demographies"
+	singularDem = "Demography"
+	pluralDem   = "Demographies"
 )
 
 // --- Per row
@@ -32,12 +32,12 @@ func GetAllDemographies(ctx *gin.Context) {
 	meta, offset := hp.CalcMeta(ctx, query)
 	err := query.Limit(meta.Limit).Offset(offset).Find(&demographies).Error
 	if err != nil {
-		hp.RespError(ctx, http.StatusInternalServerError, pluralName+myE.MsgQryErr, err)
+		hp.RespError(ctx, http.StatusInternalServerError, pluralDem+myE.MsgQryErr, err)
 		return
 	}
 
 	if len(demographies) == 0 {
-		hp.RespError(ctx, http.StatusInternalServerError, singularName+myE.Msg404Err, err)
+		hp.RespError(ctx, http.StatusNotFound, singularDem+myE.Msg404Err, err)
 		return
 	}
 
@@ -45,10 +45,8 @@ func GetAllDemographies(ctx *gin.Context) {
 }
 
 func GetDemographyById(ctx *gin.Context) {
-	id := ctx.Param("id")
-	parsedID, err := uuid.Parse(id)
+	parsedID, err := validation.ParseUrlID(ctx)
 	if err != nil {
-		hp.RespError(ctx, http.StatusInternalServerError, myE.MsgParseParamIdErr, err)
 		return
 	}
 
@@ -56,7 +54,7 @@ func GetDemographyById(ctx *gin.Context) {
 	err = cfg.DB.First(&demography, "id = ?", parsedID).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			hp.RespError(ctx, http.StatusNotFound, singularName+myE.Msg404Err, err)
+			hp.RespError(ctx, http.StatusNotFound, singularDem+myE.Msg404Err, err)
 			return
 		}
 		hp.RespError(ctx, http.StatusInternalServerError, myE.MsgSvrErr, err)
@@ -67,17 +65,13 @@ func GetDemographyById(ctx *gin.Context) {
 }
 
 func CreateDemography(ctx *gin.Context) {
-	// Authorization
-	_, err := hp.GetUserIDFromCtx(ctx)
+	_, err := validation.AuthUser(ctx)
 	if err != nil {
-		hp.RespError(ctx, http.StatusUnauthorized, myE.Msg401Err, err)
 		return
 	}
 
-	var input models.CreateDemographies
-	err = ctx.ShouldBindJSON(&input)
+	input, err := validation.ParseInputJSON[models.CreateDemographies](ctx)
 	if err != nil {
-		hp.RespError(ctx, http.StatusBadRequest, myE.Msg400Err, err)
 		return
 	}
 
@@ -123,17 +117,13 @@ func CreateDemography(ctx *gin.Context) {
 }
 
 func UpdateDemography(ctx *gin.Context) {
-	// Authorization
-	_, err := hp.GetUserIDFromCtx(ctx)
+	_, err := validation.AuthUser(ctx)
 	if err != nil {
-		hp.RespError(ctx, http.StatusUnauthorized, myE.Msg401Err, err)
 		return
 	}
 
-	id := ctx.Param("id")
-	parsedID, err := uuid.Parse(id)
+	parsedID, err := validation.ParseUrlID(ctx)
 	if err != nil {
-		hp.RespError(ctx, http.StatusBadRequest, "Invalid blog ID", err)
 		return
 	}
 
@@ -148,7 +138,7 @@ func UpdateDemography(ctx *gin.Context) {
 	err = cfg.DB.First(&demography, "id = ?", parsedID).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			hp.RespError(ctx, http.StatusNotFound, singularName+myE.Msg404Err, err)
+			hp.RespError(ctx, http.StatusNotFound, singularDem+myE.Msg404Err, err)
 			return
 		}
 
@@ -215,21 +205,18 @@ func UpdateDemography(ctx *gin.Context) {
 		return
 	}
 
-	hp.RespSuccess(ctx, http.StatusOK, singularName+myE.MsgPtc200, demography, "", nil)
+	hp.RespSuccess(ctx, http.StatusOK, singularDem+myE.MsgPtc200, demography, "", nil)
 }
 
 func DeleteDemography(ctx *gin.Context) {
 	// Authorization
-	_, err := hp.GetUserIDFromCtx(ctx)
+	_, err := validation.AuthUser(ctx)
 	if err != nil {
-		hp.RespError(ctx, http.StatusUnauthorized, myE.Msg401Err, err)
 		return
 	}
 
-	id := ctx.Param("id")
-	parsedID, err := uuid.Parse(id)
+	parsedID, err := validation.ParseUrlID(ctx)
 	if err != nil {
-		hp.RespError(ctx, http.StatusBadRequest, "Invalid blog ID", err)
 		return
 	}
 
@@ -237,7 +224,7 @@ func DeleteDemography(ctx *gin.Context) {
 	err = cfg.DB.First(&demography, "id = ?", parsedID).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			hp.RespError(ctx, http.StatusNotFound, singularName+myE.Msg404Err, err)
+			hp.RespError(ctx, http.StatusNotFound, singularDem+myE.Msg404Err, err)
 			return
 		}
 
@@ -251,7 +238,7 @@ func DeleteDemography(ctx *gin.Context) {
 		return
 	}
 
-	hp.RespSuccess(ctx, http.StatusOK, singularName+myE.MsgDel200, demography, "", nil)
+	hp.RespSuccess(ctx, http.StatusOK, singularDem+myE.MsgDel200, demography, "", nil)
 }
 
 // --- For Geography card & Overview
