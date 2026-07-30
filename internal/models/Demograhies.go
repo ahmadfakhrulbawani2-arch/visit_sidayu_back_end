@@ -7,8 +7,8 @@ type Demographies struct {
 	MalePopulation         int     `json:"male_population,omitempty"`
 	FemalePopulation       int     `json:"female_population,omitempty"`
 	TotalPopulation        int     `json:"total_population,omitempty"`
-	PopulationDensityUnit  string  `json:"population_density_unit"`
-	PopulationDensity      float64 `json:"population_density"`
+	PopulationDensityUnit  *string `json:"population_density_unit,omitempty"`
+	PopulationDensity      float64 `json:"population_density,omitempty"`
 	FamiliesNumber         int     `json:"families_number,omitempty"`
 	NumberOfBirth          int     `json:"number_of_birth,omitempty"`
 	NumberOfDeath          int     `json:"number_of_death,omitempty"`
