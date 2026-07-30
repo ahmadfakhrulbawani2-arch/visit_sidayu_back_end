@@ -88,8 +88,8 @@ func CreateDemography(ctx *gin.Context) {
 	copier.Copy(&demography, &input)
 
 	var geo models.Geographies
-	err = cfg.DB.Where("village_name = ?", input.VillageName).Select("area", "area_unit").First(&geo).Error
-	if err != nil {
+	err = cfg.DB.Where("village_name = ?", input.VillageName).First(&geo).Error
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		hp.RespError(ctx, http.StatusInternalServerError, "Village geography data not found", err)
 		return
 	}
@@ -102,8 +102,10 @@ func CreateDemography(ctx *gin.Context) {
 
 	demography.PopulationDensity = populationDensity
 	demography.PopulationDensityUnit = unit
+	demography.TotalPopulation = totalPopulation
 
-	err = cfg.DB.Create(&demography).Error
+	// demography should be using Save as it was created when user create geographies first
+	err = cfg.DB.Save(&demography).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrDuplicatedKey) {
 			hp.RespError(ctx, http.StatusConflict, "Some key are"+myE.Msg409Err, err)
@@ -166,8 +168,8 @@ func UpdateDemography(ctx *gin.Context) {
 	}
 
 	var geo models.Geographies
-	err = cfg.DB.Where("village_name = ?", input.VillageName).Select("area", "area_unit").First(&geo).Error
-	if err != nil {
+	err = cfg.DB.Where("village_name = ?", input.VillageName).First(&geo).Error
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		hp.RespError(ctx, http.StatusInternalServerError, "Village geography data not found", err)
 		return
 	}
@@ -176,7 +178,7 @@ func UpdateDemography(ctx *gin.Context) {
 
 	var newTotalPopulation int
 	var newPopulationDensity float64
-	var unit string
+	var unit *string
 	if input.FemalePopulation != nil || input.MalePopulation != nil {
 
 		malePop := demography.MalePopulation
@@ -198,6 +200,7 @@ func UpdateDemography(ctx *gin.Context) {
 
 	demography.PopulationDensity = newPopulationDensity
 	demography.PopulationDensityUnit = unit
+	demography.TotalPopulation = newTotalPopulation
 
 	err = cfg.DB.Save(&demography).Error
 	if err != nil {

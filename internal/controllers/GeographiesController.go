@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"slices"
 	cfg "visit-sidayu-backend/internal/config"
+	"visit-sidayu-backend/internal/constants/errorss"
 	myE "visit-sidayu-backend/internal/constants/errorss"
 	hp "visit-sidayu-backend/internal/helpers"
 	"visit-sidayu-backend/internal/helpers/validation"
@@ -95,6 +96,32 @@ func CreateGeography(ctx *gin.Context) {
 	var geography models.Geographies
 	copier.Copy(&geography, &input)
 
+	// update demography if found
+	var demography models.Demographies
+	err = cfg.DB.Where("village_name = ?", geography.VillageName).First(&demography).Error
+
+	notFound := errors.Is(err, gorm.ErrRecordNotFound)
+	if err != nil && !notFound {
+		hp.RespError(ctx, http.StatusInternalServerError, "Village geography data not found", err)
+		return
+	}
+
+	demography.PopulationDensity, demography.PopulationDensityUnit, err = hp.CalcPopulationDensity(demography.TotalPopulation, geography.Area, geography.AreaUnit)
+	if err != nil {
+		hp.RespError(ctx, http.StatusInternalServerError, errorss.MsgSvrErr, err)
+	}
+
+	if !notFound {
+		// need to make it only update if found, to prevent creating unwanted record
+		err = cfg.DB.Save(&demography).Error
+		if err != nil {
+			hp.RespError(ctx, http.StatusInternalServerError, myE.MsgSvrErr, err)
+			return
+		}
+	}
+
+	// then create the geography
+
 	err = cfg.DB.Create(&geography).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrDuplicatedKey) {
@@ -157,6 +184,30 @@ func UpdateGeography(ctx *gin.Context) {
 	}
 
 	copier.CopyWithOption(&geography, &input, copier.Option{IgnoreEmpty: true, DeepCopy: true})
+
+	// fetch related demography data to update it
+	var demography models.Demographies
+	err = cfg.DB.Where("village_name = ?", geography.VillageName).First(&demography).Error
+	if err != nil {
+		hp.RespError(ctx, http.StatusInternalServerError, "Village demography data not found", err)
+		return
+	}
+
+	// calc new pop den
+	newPopulationDensity, unit, err := hp.CalcPopulationDensity(demography.TotalPopulation, geography.Area, geography.AreaUnit)
+	if err != nil {
+		hp.RespError(ctx, http.StatusInternalServerError, errorss.MsgSvrErr, err)
+	}
+
+	demography.PopulationDensity = newPopulationDensity
+	demography.PopulationDensityUnit = unit
+
+	// save it all the way
+	err = cfg.DB.Save(&demography).Error
+	if err != nil {
+		hp.RespError(ctx, http.StatusInternalServerError, myE.MsgSvrErr, err)
+		return
+	}
 
 	err = cfg.DB.Save(&geography).Error
 	if err != nil {
