@@ -183,8 +183,6 @@ func UpdateGeography(ctx *gin.Context) {
 		return
 	}
 
-	copier.CopyWithOption(&geography, &input, copier.Option{IgnoreEmpty: true, DeepCopy: true})
-
 	// fetch related demography data to update it
 	var demography models.Demographies
 	err = cfg.DB.Where("village_name = ?", geography.VillageName).First(&demography).Error
@@ -192,6 +190,9 @@ func UpdateGeography(ctx *gin.Context) {
 		hp.RespError(ctx, http.StatusInternalServerError, "Village demography data not found", err)
 		return
 	}
+
+	// make sure to copy after fetch the geography
+	copier.CopyWithOption(&geography, &input, copier.Option{IgnoreEmpty: true, DeepCopy: true})
 
 	// calc new pop den
 	newPopulationDensity, unit, err := hp.CalcPopulationDensity(demography.TotalPopulation, geography.Area, geography.AreaUnit)
@@ -201,6 +202,9 @@ func UpdateGeography(ctx *gin.Context) {
 
 	demography.PopulationDensity = newPopulationDensity
 	demography.PopulationDensityUnit = unit
+
+	// in case there's name change
+	demography.VillageName = geography.VillageName
 
 	// save it all the way
 	err = cfg.DB.Save(&demography).Error
@@ -238,6 +242,27 @@ func DeleteGeograhy(ctx *gin.Context) {
 			return
 		}
 
+		hp.RespError(ctx, http.StatusInternalServerError, myE.MsgSvrErr, err)
+		return
+	}
+
+	var demo models.Demographies
+	err = cfg.DB.First(&demo, "village_name = ?", geography.VillageName).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			hp.RespError(ctx, http.StatusNotFound, singularGeo+myE.Msg404Err, err)
+			return
+		}
+
+		hp.RespError(ctx, http.StatusInternalServerError, myE.MsgSvrErr, err)
+		return
+	}
+
+	demo.PopulationDensity = 0
+	demo.PopulationDensityUnit = nil
+	err = cfg.DB.Save(&demo).Error
+
+	if err != nil {
 		hp.RespError(ctx, http.StatusInternalServerError, myE.MsgSvrErr, err)
 		return
 	}
