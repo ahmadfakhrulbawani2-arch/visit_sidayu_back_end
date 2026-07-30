@@ -39,12 +39,12 @@ type GetDistrictGeographies struct {
 }
 
 type UpdateGeographies struct {
-	VillageName  *string     `json:"village_name" binding:"required"`
-	Area         *float64    `json:"area"`
-	AreaUnit     *string     `json:"area_unit" binding:"required"`
-	RainfallRate *float64    `json:"rainfall_rate"`
-	RainfallUnit *string     `json:"rainfall_unit" binding:"required"`
-	RainyDay     *int        `json:"rainy_day"`
+	VillageName  *string    `json:"village_name" binding:"required"`
+	Area         *float64   `json:"area"`
+	AreaUnit     *string    `json:"area_unit" binding:"required"`
+	RainfallRate *float64   `json:"rainfall_rate"`
+	RainfallUnit *string    `json:"rainfall_unit" binding:"required"`
+	RainyDay     *int       `json:"rainy_day"`
 	ImageID      *uuid.UUID `json:"image_id"`
-	Source       *string     `json:"source" binding:"required"`
+	Source       *string    `json:"source" binding:"required"`
 }

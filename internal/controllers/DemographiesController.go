@@ -168,12 +168,13 @@ func UpdateDemography(ctx *gin.Context) {
 	}
 
 	var geo models.Geographies
-	err = cfg.DB.Where("village_name = ?", input.VillageName).First(&geo).Error
-	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+	err = cfg.DB.Where("village_name = ?", demography.VillageName).First(&geo).Error
+	if err != nil {
 		hp.RespError(ctx, http.StatusInternalServerError, "Village geography data not found", err)
 		return
 	}
 
+	// make sure to copy after fetch the geography
 	copier.CopyWithOption(&demography, &input, copier.Option{IgnoreEmpty: true, DeepCopy: true})
 
 	var newTotalPopulation int
@@ -201,6 +202,15 @@ func UpdateDemography(ctx *gin.Context) {
 	demography.PopulationDensity = newPopulationDensity
 	demography.PopulationDensityUnit = unit
 	demography.TotalPopulation = newTotalPopulation
+
+	// in case there's name change
+	geo.VillageName = demography.VillageName
+
+	err = cfg.DB.Save(&geo).Error
+	if err != nil {
+		hp.RespError(ctx, http.StatusInternalServerError, myE.MsgSvrErr, err)
+		return
+	}
 
 	err = cfg.DB.Save(&demography).Error
 	if err != nil {
