@@ -14,6 +14,12 @@ type Galleries struct {
 type CreateGalleries struct {
 	Name        string    `json:"name" binding:"required"`
 	Description string    `json:"description" binding:"required"`
-	Slug        string    `json:"slug"`
 	ImageID     uuid.UUID `json:"image_id" binding:"required"`
+}
+
+type UpdateGalleries struct {
+	Name        *string    `json:"name"`
+	Description *string    `json:"description"`
+	Slug        *string    `json:"slug"`
+	ImageID     *uuid.UUID `json:"image_id"`
 }

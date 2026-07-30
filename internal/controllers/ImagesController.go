@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	hp "visit-sidayu-backend/internal/helpers"
+	"visit-sidayu-backend/internal/helpers/validation"
 	"visit-sidayu-backend/internal/models"
 
 	cfg "visit-sidayu-backend/internal/config"
@@ -52,11 +53,14 @@ func UploadImage(ctx *gin.Context) {
 		hp.RespError(ctx, http.StatusInternalServerError, "Failed to uplaod image to Imagekit, this may happenned because not enough storage, bad connection, etc.", err)
 	}
 	customName := ctx.DefaultPostForm("custom_name", filename)
-	newImage := models.CreateImages{
-		Name:       filename,
-		ImageUrl:   uploadRes.URL,
-		FileID:     uploadRes.FileID,
-		CustomName: customName,
+	inputDesc := ctx.DefaultPostForm("description", filename)
+
+	newImage := models.Images{
+		Name:        filename,
+		ImageUrl:    uploadRes.URL,
+		FileID:      uploadRes.FileID,
+		CustomName:  customName,
+		Description: inputDesc,
 	}
 
 	err = cfg.DB.Create(&newImage).Error
@@ -131,48 +135,50 @@ func UpdateImage(ctx *gin.Context) {
 
 	defer file.Close()
 
+	// upload file first
 	filename := header.Filename
 	ik := initImageKit()
 	updateRes, err := ik.Files.Upload(context.TODO(), imagekit.FileUploadParams{
 		File:     file,
 		FileName: filename,
 	})
-
-	paramsId := ctx.Param("id")
-	parsedParamsId, err := uuid.Parse(paramsId)
 	if err != nil {
-		hp.RespError(ctx, http.StatusInternalServerError, "Can not parse parameters", err)
+		hp.RespError(ctx, http.StatusInternalServerError, "Failed to upload image", err)
 		return
 	}
 
-	var errNotFound = cfg.DB.First(&image, "id = ?", parsedParamsId)
+	parsedParamsId, err := validation.ParseUrlID(ctx)
+	if err != nil {
+		return
+	}
+
+	var errNotFound = cfg.DB.First(&image, "id = ?", parsedParamsId).Error
 	if errNotFound != nil {
 		hp.RespError(ctx, http.StatusNotFound, "Can not found image data", nil, "Data not found in database")
 		return
 	}
 
 	customName := ctx.DefaultPostForm("custom_name", filename)
+	inputDesc := ctx.DefaultPostForm("description", filename)
 	updatedImage := models.CreateImages{
-		Name:       filename,
-		ImageUrl:   updateRes.URL,
-		FileID:     updateRes.FileID,
-		CustomName: customName,
+		Name:        filename,
+		ImageUrl:    updateRes.URL,
+		FileID:      updateRes.FileID,
+		CustomName:  customName,
+		Description: inputDesc,
 	}
 
-	err = cfg.DB.Model(&image).Updates(updatedImage).Error
+	// delete the unused image
+	err = ik.Files.Delete(context.TODO(), image.FileID)
 	if err != nil {
-		hp.RespError(ctx, http.StatusInternalServerError, "Failed to update data image into database, this can happened due to not enough database capacity, database bad connection, etc.", err)
+		hp.RespError(ctx, http.StatusInternalServerError, "Failed to uplaod image to Imagekit, this may happenned due to imagekit server error, bad connection, etc.", err)
 		return
 	}
 
-	err = cfg.DB.First(&image, "id = ?", parsedParamsId).Error
+	// then update the db
+	err = cfg.DB.Model(&image).Updates(updatedImage).Error
 	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			hp.RespError(ctx, http.StatusNotFound, "Image not found", nil)
-			return
-		}
-
-		hp.RespError(ctx, http.StatusInternalServerError, "Failed to fetch image", err)
+		hp.RespError(ctx, http.StatusInternalServerError, "Failed to update data image into database, this can happened due to not enough database capacity, database bad connection, etc.", err)
 		return
 	}
 
