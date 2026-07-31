@@ -106,6 +106,7 @@ func main() {
 		{
 			geo_api.GET("/", ctr.GetAllGeographies)
 			geo_api.GET("/id/:id", ctr.GetGeographyByID)
+			geo_api.GET("/district", ctr.GetDistrictGeographies)
 		}
 
 		ind_api := V1_api.Group("/industries-blogs")
