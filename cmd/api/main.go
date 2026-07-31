@@ -99,6 +99,7 @@ func main() {
 		{
 			g_api.GET("/", ctr.GetAllGalleries)
 			g_api.GET("/id/:id", ctr.GetGalleryByID)
+			g_api.GET("/slug/:slug", ctr.GetGalleryBySlug)
 		}
 
 		geo_api := V1_api.Group("/geographies")
