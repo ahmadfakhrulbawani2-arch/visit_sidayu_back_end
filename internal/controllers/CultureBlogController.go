@@ -31,7 +31,7 @@ func GetAllCultureBlog(ctx *gin.Context) {
 	}
 
 	if len(cBlogs) == 0 {
-		hp.RespError(ctx, http.StatusNotFound, "Can not found blogs data", nil, "Data not found in database")
+		hp.RespError(ctx, http.StatusInternalServerError, "Culture blogs"+myE.Msg404Err, nil, myE.Err404Fill)
 		return
 	}
 

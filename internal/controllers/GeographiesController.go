@@ -43,7 +43,7 @@ func GetAllGeographies(ctx *gin.Context) {
 	}
 
 	if len(geographies) == 0 {
-		hp.RespError(ctx, http.StatusNotFound, singularGeo+myE.Msg404Err, err)
+		hp.RespError(ctx, http.StatusNotFound, singularGeo+myE.Msg404Err, nil, errorss.Err404Fill)
 		return
 	}
 

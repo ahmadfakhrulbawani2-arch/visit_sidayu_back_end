@@ -39,7 +39,7 @@ func GetAllGalleries(ctx *gin.Context) {
 	}
 
 	if len(galleries) == 0 {
-		hp.RespError(ctx, http.StatusNotFound, pluralGal+myE.Msg404Err, err)
+		hp.RespError(ctx, http.StatusNotFound, pluralGal+myE.Msg404Err, nil, myE.Err404Fill)
 		return
 	}
 

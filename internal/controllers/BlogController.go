@@ -4,6 +4,7 @@ import (
 	"errors"
 	"net/http"
 	cfg "visit-sidayu-backend/internal/config"
+	myE "visit-sidayu-backend/internal/constants/errorss"
 	hp "visit-sidayu-backend/internal/helpers"
 	"visit-sidayu-backend/internal/models"
 
@@ -31,7 +32,7 @@ func GetAllBlogs(ctx *gin.Context) {
 	}
 
 	if len(blogs) == 0 {
-		hp.RespError(ctx, http.StatusNotFound, "Can not found blogs data", nil, "Data not found in database")
+		hp.RespError(ctx, http.StatusInternalServerError, "Blogs"+myE.Msg404Err, nil, myE.Err404Fill)
 		return
 	}
 

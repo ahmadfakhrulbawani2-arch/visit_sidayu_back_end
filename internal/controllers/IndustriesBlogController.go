@@ -26,7 +26,7 @@ func GetAllIndustriesBlog(ctx *gin.Context) {
 
 	search := ctx.Query("search")
 	if search != "" {
-		query = query.Where("title ILIKE ? OR location ILIKE ? OR produced_product ILIKE ?", "%"+search+"%", "%"+search+"%", "%"+search+"%")
+		query = query.Where("title ILIKE ? OR location ILIKE ? OR produced_products ILIKE ?", "%"+search+"%", "%"+search+"%", "%"+search+"%")
 	}
 
 	meta, offset := hp.CalcMeta(ctx, query)
@@ -38,7 +38,7 @@ func GetAllIndustriesBlog(ctx *gin.Context) {
 	}
 
 	if len(iBlog) == 0 {
-		hp.RespError(ctx, http.StatusInternalServerError, pluralIBlogs+myE.Msg404Err, err)
+		hp.RespError(ctx, http.StatusInternalServerError, pluralIBlogs+myE.Msg404Err, nil, myE.Err404Fill)
 		return
 	}
 
