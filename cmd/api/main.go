@@ -113,6 +113,7 @@ func main() {
 		{
 			ind_api.GET("/", ctr.GetAllIndustriesBlog)
 			ind_api.GET("/id/:id", ctr.GetIndustryBlogByID)
+			ind_api.GET("/slug/:slug", ctr.GetIndustryBlogBySlug)
 		}
 
 		ofc_api := V1_api.Group("/officials")

@@ -1,23 +1,207 @@
 package controllers
 
-import "github.com/gin-gonic/gin"
+import (
+	"errors"
+	"net/http"
+	"slices"
+	cfg "visit-sidayu-backend/internal/config"
+	myE "visit-sidayu-backend/internal/constants/errorss"
+	hp "visit-sidayu-backend/internal/helpers"
+	"visit-sidayu-backend/internal/helpers/validation"
+	"visit-sidayu-backend/internal/models"
+
+	"github.com/gin-gonic/gin"
+	"github.com/jinzhu/copier"
+	"gorm.io/gorm"
+)
+
+var (
+	pluralIBlogs  = "Industries blogs"
+	singularIBlog = "Industry blog"
+)
 
 func GetAllIndustriesBlog(ctx *gin.Context) {
+	var iBlog []models.IndustriesBlogs
+	query := cfg.DB.Model(&models.IndustriesBlogs{})
 
+	search := ctx.Query("search")
+	if search != "" {
+		query = query.Where("title ILIKE ? OR location ILIKE ? OR produced_products ILIKE ?", "%"+search+"%", "%"+search+"%", "%"+search+"%")
+	}
+
+	meta, offset := hp.CalcMeta(ctx, query)
+
+	err := query.Preload("Thumbnail").Limit(meta.Limit).Offset(offset).Find(&iBlog).Error
+	if err != nil {
+		hp.RespError(ctx, http.StatusInternalServerError, pluralIBlogs+myE.MsgQryErr, err)
+		return
+	}
+
+	if len(iBlog) == 0 {
+		hp.RespError(ctx, http.StatusInternalServerError, pluralIBlogs+myE.Msg404Err, nil, myE.Err404Fill)
+		return
+	}
+
+	hp.RespSuccess(ctx, http.StatusOK, pluralIBlogs+myE.MsgGet200, iBlog, "", meta)
 }
 
 func GetIndustryBlogByID(ctx *gin.Context) {
+	id, err := validation.ParseUrlID(ctx)
+	if err != nil {
+		return
+	}
 
+	var iBlog models.IndustriesBlogs
+	err = cfg.DB.Preload("Thumbnail").First(&iBlog, "id = ?", id).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			hp.RespError(ctx, http.StatusNotFound, singularIBlog+myE.Msg404Err, nil)
+			return
+		}
+
+		hp.RespError(ctx, http.StatusInternalServerError, myE.MsgSvrErr, err)
+		return
+	}
+
+	hp.RespSuccess(ctx, http.StatusOK, singularIBlog+myE.MsgGet200, iBlog, "", nil)
+}
+
+func GetIndustryBlogBySlug(ctx *gin.Context) {
+	slug := ctx.Param("slug")
+
+	var iBlog models.IndustriesBlogs
+	err := cfg.DB.Preload("Thumbnail").First(&iBlog, "slug = ?", slug).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			hp.RespError(ctx, http.StatusNotFound, singularIBlog+myE.Msg404Err, nil)
+			return
+		}
+
+		hp.RespError(ctx, http.StatusInternalServerError, myE.MsgSvrErr, err)
+		return
+	}
+
+	hp.RespSuccess(ctx, http.StatusOK, singularIBlog+myE.MsgGet200, iBlog, "", nil)
 }
 
 func CreateIndustryBlog(ctx *gin.Context) {
+	_, err := validation.AuthUser(ctx)
+	if err != nil {
+		return
+	}
+
+	input, err := validation.ParseInputJSON[models.CreateIndustriesBlogsReq](ctx)
+	if err != nil {
+		return
+	}
+
+	newIBlog := input.ToModel()
+	hp.GenerateSlugWithTimestamp(newIBlog.Title, &newIBlog)
+	err = cfg.DB.Create(&newIBlog).Error
+	if err != nil {
+		hp.RespError(ctx, http.StatusInternalServerError, myE.MsgSvrErr, err)
+		return
+	}
+
+	if input.ThumbnailID != nil {
+		cfg.DB.Model(&newIBlog).Association("Thumbnail").Find(&newIBlog.Thumbnail)
+	}
+
+	hp.RespSuccess(ctx, http.StatusCreated, singularIBlog+myE.MsgPst201, newIBlog, "", nil)
 
 }
 
 func UpdateIndustryBlog(ctx *gin.Context) {
+	_, err := validation.AuthUser(ctx)
+	if err != nil {
+		return
+	}
+
+	id, err := validation.ParseUrlID(ctx)
+	if err != nil {
+		return
+	}
+
+	input, err := validation.ParseInputJSON[models.UpdateIndustriesBlogsReq](ctx)
+	if err != nil {
+		return
+	}
+
+	var iBlog models.IndustriesBlogs
+	err = cfg.DB.Preload("Thumbnail").First(&iBlog, "id = ?", id).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			hp.RespError(ctx, http.StatusNotFound, singularIBlog+myE.Msg404Err, nil)
+			return
+		}
+
+		hp.RespError(ctx, http.StatusInternalServerError, myE.MsgSvrErr, err)
+		return
+	}
+
+	hasUpdate := input.BusinessType != nil ||
+		input.Content != "" ||
+		input.EmployeesCount != nil ||
+		input.Location != nil ||
+		!slices.Equal(input.ProducedProducts, iBlog.ProducedProducts) ||
+		input.ProductionRatesPiecePerDay != nil ||
+		input.Rating != nil ||
+		input.Revenue != nil ||
+		input.ThumbnailID != nil ||
+		input.Title != "" ||
+		input.YearFounded != nil
+
+	if !hasUpdate {
+		hp.RespError(ctx, http.StatusBadRequest, myE.MsgNoInput, nil, myE.Msg400Err)
+		return
+	}
+
+	copier.CopyWithOption(&iBlog, &input, copier.Option{IgnoreEmpty: true, DeepCopy: true})
+
+	if input.Title != "" {
+		hp.GenerateSlugWithTimestamp(iBlog.Title, &iBlog)
+	}
+
+	err = cfg.DB.Save(&iBlog).Error
+	if err != nil {
+		hp.RespError(ctx, http.StatusInternalServerError, myE.BaseSvrErr, err)
+		return
+	}
+
+	cfg.DB.Model(&iBlog).Association("Thumbnail").Find(&iBlog.Thumbnail)
+
+	hp.RespSuccess(ctx, http.StatusOK, singularIBlog+myE.MsgPtc200, iBlog, "", nil)
 
 }
 
 func DeleteIndustryBlog(ctx *gin.Context) {
+	_, err := validation.AuthUser(ctx)
+	if err != nil {
+		return
+	}
 
+	id, err := validation.ParseUrlID(ctx)
+	if err != nil {
+		return
+	}
+
+	var iBlog models.IndustriesBlogs
+	err = cfg.DB.Preload("Thumbnail").First(&iBlog, "id = ?", id).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			hp.RespError(ctx, http.StatusNotFound, singularIBlog+myE.Msg404Err, nil)
+			return
+		}
+
+		hp.RespError(ctx, http.StatusInternalServerError, myE.MsgSvrErr, err)
+		return
+	}
+
+	err = cfg.DB.Unscoped().Delete(&iBlog).Error
+	if err != nil {
+		hp.RespError(ctx, http.StatusInternalServerError, myE.MsgSvrErr, err)
+		return
+	}
+
+	hp.RespSuccess(ctx, http.StatusOK, singularIBlog+myE.MsgDel200, iBlog, "", nil)
 }

@@ -4,6 +4,7 @@ import (
 	"errors"
 	"net/http"
 	cfg "visit-sidayu-backend/internal/config"
+	myE "visit-sidayu-backend/internal/constants/errorss"
 	hp "visit-sidayu-backend/internal/helpers"
 	"visit-sidayu-backend/internal/models"
 
@@ -30,7 +31,7 @@ func GetAllCultureBlog(ctx *gin.Context) {
 	}
 
 	if len(cBlogs) == 0 {
-		hp.RespError(ctx, http.StatusNotFound, "Can not found blogs data", nil, "Data not found in database")
+		hp.RespError(ctx, http.StatusInternalServerError, "Culture blogs"+myE.Msg404Err, nil, myE.Err404Fill)
 		return
 	}
 
@@ -156,7 +157,7 @@ func UpdateCultureBlog(ctx *gin.Context) {
 		input.Timeline != nil
 
 	if !hasUpdate {
-		hp.RespError(ctx, http.StatusBadRequest, "No fields provided for update", nil)
+		hp.RespError(ctx, http.StatusBadRequest, myE.MsgNoInput, nil, myE.Msg400Err)
 		return
 	}
 

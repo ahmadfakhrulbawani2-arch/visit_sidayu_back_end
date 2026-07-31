@@ -43,7 +43,7 @@ func GetAllGeographies(ctx *gin.Context) {
 	}
 
 	if len(geographies) == 0 {
-		hp.RespError(ctx, http.StatusNotFound, singularGeo+myE.Msg404Err, err)
+		hp.RespError(ctx, http.StatusNotFound, singularGeo+myE.Msg404Err, nil, errorss.Err404Fill)
 		return
 	}
 
@@ -182,7 +182,7 @@ func UpdateGeography(ctx *gin.Context) {
 		input.VillageName != nil
 
 	if !hasUpdate {
-		hp.RespError(ctx, http.StatusBadRequest, myE.MsgNoInput, nil)
+		hp.RespError(ctx, http.StatusBadRequest, myE.MsgNoInput, nil, myE.Msg400Err)
 		return
 	}
 

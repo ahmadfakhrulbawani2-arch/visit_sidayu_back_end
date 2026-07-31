@@ -40,7 +40,7 @@ func GetAllDemographies(ctx *gin.Context) {
 	}
 
 	if len(demographies) == 0 {
-		hp.RespError(ctx, http.StatusNotFound, singularDem+myE.Msg404Err, err)
+		hp.RespError(ctx, http.StatusNotFound, singularDem+myE.Msg404Err, nil, myE.Err404Fill)
 		return
 	}
 
@@ -166,7 +166,7 @@ func UpdateDemography(ctx *gin.Context) {
 		input.ExternalLinkSource != nil
 
 	if !hasUpdate {
-		hp.RespError(ctx, http.StatusBadRequest, myE.MsgNoInput, nil)
+		hp.RespError(ctx, http.StatusBadRequest, myE.MsgNoInput, nil, myE.Msg400Err)
 		return
 	}
 

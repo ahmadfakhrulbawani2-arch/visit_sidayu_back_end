@@ -39,7 +39,7 @@ func GetAllGalleries(ctx *gin.Context) {
 	}
 
 	if len(galleries) == 0 {
-		hp.RespError(ctx, http.StatusNotFound, pluralGal+myE.Msg404Err, err)
+		hp.RespError(ctx, http.StatusNotFound, pluralGal+myE.Msg404Err, nil, myE.Err404Fill)
 		return
 	}
 
@@ -142,7 +142,7 @@ func UpdateGallery(ctx *gin.Context) {
 		input.ImageID != nil
 
 	if !hasUpdate {
-		hp.RespError(ctx, http.StatusBadRequest, myE.MsgNoInput, nil)
+		hp.RespError(ctx, http.StatusBadRequest, myE.MsgNoInput, nil, myE.Msg400Err)
 		return
 	}
 
