@@ -104,6 +104,8 @@ func CreateBlog(ctx *gin.Context) {
 		return
 	}
 
+	cfg.DB.Model(&newBlog).Association("Thumbnail").Find(&newBlog.Thumbnail)
+
 	hp.RespSuccess(ctx, http.StatusCreated, "New blog created!", newBlog, "", nil)
 }
 
@@ -168,6 +170,8 @@ func UpdateBlog(ctx *gin.Context) {
 		hp.RespError(ctx, http.StatusInternalServerError, "Failed to update blog", err)
 	}
 
+	cfg.DB.Model(&blog).Association("Thumbnail").Find(&blog.Thumbnail)
+
 	hp.RespSuccess(ctx, http.StatusOK, "Blog updated!", blog, "", nil)
 }
 
@@ -187,7 +191,7 @@ func DeleteBlog(ctx *gin.Context) {
 	}
 
 	var blog models.Blogs
-	err = cfg.DB.First(&blog, "id = ?", parsedID).Error
+	err = cfg.DB.Preload("Thumbnail").First(&blog, "id = ?", parsedID).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			hp.RespError(ctx, http.StatusNotFound, "Blog not found", nil,
