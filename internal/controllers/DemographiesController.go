@@ -166,7 +166,7 @@ func UpdateDemography(ctx *gin.Context) {
 		input.ExternalLinkSource != nil
 
 	if !hasUpdate {
-		hp.RespError(ctx, http.StatusBadRequest, myE.MsgNoInput, nil)
+		hp.RespError(ctx, http.StatusBadRequest, myE.MsgNoInput, nil, myE.Msg400Err)
 		return
 	}
 

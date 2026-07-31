@@ -53,6 +53,7 @@ func CreateDemograhies(db *gorm.DB, d models.CreateDemographies) error {
 func CreateGalleries(db *gorm.DB, g models.CreateGalleries) error {
 	var gallery models.Galleries
 	copier.Copy(&gallery, &g)
+	hp.GenerateSlugWithTimestamp(gallery.Name, &gallery)
 	return db.Create(&gallery).Error
 }
 
@@ -71,7 +72,7 @@ func CreateImages(db *gorm.DB, req models.CreateImages) (*models.Images, error) 
 
 func CreateIndustriesBlog(db *gorm.DB, i models.CreateIndustriesBlogsReq) error {
 	ind := i.ToModel()
-
+	hp.GenerateSlugWithTimestamp(ind.Title, &ind)
 	return db.Create(&ind).Error
 }
 

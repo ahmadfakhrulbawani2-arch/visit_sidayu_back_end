@@ -4,6 +4,7 @@ import (
 	"errors"
 	"net/http"
 	cfg "visit-sidayu-backend/internal/config"
+	myE "visit-sidayu-backend/internal/constants/errorss"
 	hp "visit-sidayu-backend/internal/helpers"
 	"visit-sidayu-backend/internal/models"
 
@@ -156,7 +157,7 @@ func UpdateCultureBlog(ctx *gin.Context) {
 		input.Timeline != nil
 
 	if !hasUpdate {
-		hp.RespError(ctx, http.StatusBadRequest, "No fields provided for update", nil)
+		hp.RespError(ctx, http.StatusBadRequest, myE.MsgNoInput, nil, myE.Msg400Err)
 		return
 	}
 

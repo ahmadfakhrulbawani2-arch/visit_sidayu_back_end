@@ -8,6 +8,7 @@ import (
 type IndustriesBlogs struct {
 	BaseModel
 	Title                      string         `json:"title" gorm:"not null"`
+	Slug                       string         `json:"slug" gorm:"unique,not null"`
 	Content                    string         `json:"content" gorm:"not null"`
 	Location                   string         `json:"location,omitempty"`
 	Rating                     float64        `json:"rating,omitempty"`
@@ -33,4 +34,18 @@ type CreateIndustriesBlogsReq struct {
 	YearFounded                int        `json:"year_founded" binding:"required"`
 	EmployeesCount             int        `json:"employees_count" binding:"required"`
 	BusinessType               string     `json:"business_type" binding:"required"`
+}
+
+type UpdateIndustriesBlogsReq struct {
+	Title                      string     `json:"title"`
+	Content                    string     `json:"content"`
+	Location                   *string    `json:"location"`
+	Rating                     *float64   `json:"rating"`
+	Revenue                    *float64   `json:"revenue"`
+	ProducedProducts           []string   `json:"produced_products" binding:"required"`
+	ProductionRatesPiecePerDay *int       `json:"production_rates_per_day"`
+	ThumbnailID                *uuid.UUID `json:"thumbnail_id"`
+	YearFounded                *int       `json:"year_founded"`
+	EmployeesCount             *int       `json:"employees_count"`
+	BusinessType               *string    `json:"business_type"`
 }

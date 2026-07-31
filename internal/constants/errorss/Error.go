@@ -14,7 +14,7 @@ var (
 	Msg400Err          = "Failed to parse incoming input. " + Base4xx
 	Msg401Err          = "Unauthorized access, read the error value!" + Base4xx
 	Msg409Err          = " already created. " + Base4xx
-	MsgNoInput         = "No fields provided for update" + Base4xx
+	MsgNoInput         = "No fields provided for update. " + Base4xx
 
 	Err409Fill = "Caught recreating/re-registering data"
 
