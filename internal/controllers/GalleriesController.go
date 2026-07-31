@@ -103,6 +103,8 @@ func CreateGallery(ctx *gin.Context) {
 		return
 	}
 
+	cfg.DB.Model(&newGallery).Association("Image").Find(&newGallery.Image)
+
 	hp.RespSuccess(ctx, http.StatusCreated, myE.MsgPst201, newGallery, "", nil)
 }
 
@@ -123,7 +125,7 @@ func UpdateGallery(ctx *gin.Context) {
 	}
 
 	var gallery models.Galleries
-	err = cfg.DB.First(gallery, "id = ?", id).Error
+	err = cfg.DB.First(&gallery, "id = ?", id).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			hp.RespError(ctx, http.StatusNotFound, "Blog not found", nil,
@@ -146,11 +148,17 @@ func UpdateGallery(ctx *gin.Context) {
 
 	copier.CopyWithOption(&gallery, input, copier.Option{IgnoreEmpty: true, DeepCopy: true})
 
+	if input.Name != nil {
+		hp.GenerateSlugWithTimestamp(gallery.Name, &gallery)
+	}
+
 	err = cfg.DB.Save(&gallery).Error
 	if err != nil {
 		hp.RespError(ctx, http.StatusInternalServerError, myE.MsgSvrErr, err)
 		return
 	}
+
+	cfg.DB.Model(&gallery).Association("Image").Find(&gallery.Image)
 
 	hp.RespSuccess(ctx, http.StatusOK, singularGal+myE.MsgPtc200, gallery, "", nil)
 
@@ -168,7 +176,7 @@ func DeleteGallery(ctx *gin.Context) {
 	}
 
 	var gallery models.Galleries
-	err = cfg.DB.First(&gallery, "id = ?", id).Error
+	err = cfg.DB.Preload("Image").First(&gallery, "id = ?", id).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			hp.RespError(ctx, http.StatusNotFound, singularDem+myE.Msg404Err, err)

@@ -8,6 +8,7 @@ import (
 	"visit-sidayu-backend/internal/constants/errorss"
 	myE "visit-sidayu-backend/internal/constants/errorss"
 	hp "visit-sidayu-backend/internal/helpers"
+	"visit-sidayu-backend/internal/helpers/mtk"
 	"visit-sidayu-backend/internal/helpers/validation"
 	"visit-sidayu-backend/internal/models"
 
@@ -15,12 +16,14 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/copier"
+	"github.com/lib/pq"
 	"gorm.io/gorm"
 )
 
 var (
 	singularGeo = "Geography"
 	pluralGeo   = "Geographies"
+	distGeo     = "Ditrict geography"
 )
 
 func GetAllGeographies(ctx *gin.Context) {
@@ -274,4 +277,72 @@ func DeleteGeograhy(ctx *gin.Context) {
 	}
 
 	hp.RespSuccess(ctx, http.StatusOK, singularGeo+myE.MsgDel200, geography, "", nil)
+}
+
+func GetDistrictGeographies(ctx *gin.Context) {
+	var data models.GetDistrictGeographies
+
+	var vCnt int64
+	err := cfg.DB.Model(&models.Geographies{}).Distinct("village_name").Count(&vCnt).Error
+	if err != nil {
+		hp.RespError(ctx, http.StatusInternalServerError, distGeo+myE.MsgQryErr, err)
+		return
+	}
+
+	data.VillageCount = int(vCnt)
+
+	// calc total area
+	var (
+		distAreaKm2 float64
+		distAreaHa  float64
+	)
+	err = cfg.DB.Model(&models.Geographies{}).Select("COALESCE(SUM(area), 0)").Where("area_unit = ?", "km2").Scan(&distAreaKm2).Error
+	if err != nil {
+		hp.RespError(ctx, http.StatusInternalServerError, distGeo+myE.MsgQryErr, err)
+		return
+	}
+
+	err = cfg.DB.Model(&models.Geographies{}).Select("COALESCE(SUM(area), 0)").Where("area_unit = ?", "ha").Scan(&distAreaHa).Error
+	if err != nil {
+		hp.RespError(ctx, http.StatusInternalServerError, distGeo+myE.MsgQryErr, err)
+		return
+	}
+
+	distAreaKm2 += mtk.SwitchHaToKm2(distAreaHa)
+	data.TotalArea = distAreaKm2
+	data.AreaUnit = "km2"
+
+	var result struct {
+		VillageName string  `gorm:"column:village_name"`
+		Area        float64 `gorm:"column:area"`
+	}
+
+	err = cfg.DB.Model(&models.Geographies{}).Select("village_name, area").Order("area DESC").Limit(1).Scan(&result).Error
+	if err != nil {
+		hp.RespError(ctx, http.StatusInternalServerError, distGeo+myE.MsgQryErr, err)
+		return
+	}
+
+	data.LargestVillageName = result.VillageName
+	data.LargestVillageArea = result.Area
+
+	err = cfg.DB.Model(&models.Geographies{}).Select("village_name, area").Order("area ASC").Limit(1).Scan(&result).Error
+	if err != nil {
+		hp.RespError(ctx, http.StatusInternalServerError, distGeo+myE.MsgQryErr, err)
+		return
+	}
+
+	data.SmallestVillageName = result.VillageName
+	data.SmallestVillageArea = result.Area
+
+	var sources []string
+	err = cfg.DB.Model(&models.Geographies{}).Distinct("source").Pluck("source", &sources).Error
+	if err != nil {
+		hp.RespError(ctx, http.StatusInternalServerError, distGeo+myE.MsgQryErr, err)
+		return
+	}
+
+	data.Sources = pq.StringArray(sources)
+
+	hp.RespSuccess(ctx, http.StatusOK, distGeo+myE.MsgGet200, data, "", nil)
 }

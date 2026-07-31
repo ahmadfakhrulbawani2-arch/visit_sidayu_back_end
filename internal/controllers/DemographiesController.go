@@ -7,17 +7,20 @@ import (
 	"visit-sidayu-backend/internal/constants/errorss"
 	myE "visit-sidayu-backend/internal/constants/errorss"
 	hp "visit-sidayu-backend/internal/helpers"
+	"visit-sidayu-backend/internal/helpers/mtk"
 	"visit-sidayu-backend/internal/helpers/validation"
 	"visit-sidayu-backend/internal/models"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/copier"
+	"github.com/lib/pq"
 	"gorm.io/gorm"
 )
 
 var (
 	singularDem = "Demography"
 	pluralDem   = "Demographies"
+	distDem     = "District demography"
 )
 
 // --- Per row
@@ -256,5 +259,65 @@ func DeleteDemography(ctx *gin.Context) {
 
 // --- For Geography card & Overview
 func GetDistrictDemography(ctx *gin.Context) {
+	var data models.GetDistrictDemographies
 
+	// dbD := cfg.DB.Model(&models.Demographies{})
+	// dbG := cfg.DB.Model(&models.Geographies{})
+
+	err := cfg.DB.Model(&models.Demographies{}).Select("demography_data_year").Group("demography_data_year").Order("count(*) DESC").Limit(1).Scan(&data.DemographyDataYear).Error
+	if err != nil {
+		hp.RespError(ctx, http.StatusInternalServerError, distDem+myE.MsgQryErr, err)
+		return
+	}
+
+	err = cfg.DB.Model(&models.Demographies{}).Select("SUM(male_population)").Scan(&data.MalePopulation).Error
+	if err != nil {
+		hp.RespError(ctx, http.StatusInternalServerError, distDem+myE.MsgQryErr, err)
+		return
+	}
+
+	err = cfg.DB.Model(&models.Demographies{}).Select("SUM(female_population)").Scan(&data.FemalePopulation).Error
+	if err != nil {
+		hp.RespError(ctx, http.StatusInternalServerError, distDem+myE.MsgQryErr, err)
+		return
+	}
+
+	err = cfg.DB.Model(&models.Demographies{}).Select("SUM(total_population)").Scan(&data.TotalPopulation).Error
+	if err != nil {
+		hp.RespError(ctx, http.StatusInternalServerError, distDem+myE.MsgQryErr, err)
+		return
+	}
+
+	// density pop from tot pop / tot area
+	var (
+		distAreaKm2 float64
+		distAreaHa  float64
+	)
+	err = cfg.DB.Model(&models.Geographies{}).Select("COALESCE(SUM(area), 0)").Where("area_unit = ?", "km2").Scan(&distAreaKm2).Error
+	if err != nil {
+		hp.RespError(ctx, http.StatusInternalServerError, distDem+myE.MsgQryErr, err)
+		return
+	}
+
+	err = cfg.DB.Model(&models.Geographies{}).Select("COALESCE(SUM(area), 0)").Where("area_unit = ?", "ha").Scan(&distAreaHa).Error
+	if err != nil {
+		hp.RespError(ctx, http.StatusInternalServerError, distDem+myE.MsgQryErr, err)
+		return
+	}
+
+	distAreaKm2 += mtk.SwitchHaToKm2(distAreaHa)
+
+	data.PopulationDensity = float64(data.TotalPopulation) / distAreaKm2
+	data.PopulationDensityUnit = "jiwa/km2"
+
+	var sources []string
+	err = cfg.DB.Model(&models.Demographies{}).Distinct("source_name").Pluck("source_name", &sources).Error
+	if err != nil {
+		hp.RespError(ctx, http.StatusInternalServerError, distDem+myE.MsgQryErr, err)
+		return
+	}
+
+	data.Sources = pq.StringArray(sources)
+
+	hp.RespSuccess(ctx, http.StatusOK, distDem+myE.MsgGet200, data, "", nil)
 }
