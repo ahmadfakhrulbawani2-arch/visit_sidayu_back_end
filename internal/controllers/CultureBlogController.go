@@ -103,6 +103,8 @@ func CreateCultureBlog(ctx *gin.Context) {
 		return
 	}
 
+	cfg.DB.Model(&newCBlog).Association("Thumbnail").Find(&newCBlog.Thumbnail)
+
 	hp.RespSuccess(ctx, http.StatusCreated, "New blog created!", newCBlog, "", nil)
 }
 
@@ -168,6 +170,8 @@ func UpdateCultureBlog(ctx *gin.Context) {
 		hp.RespError(ctx, http.StatusInternalServerError, "Failed to update blog", err)
 	}
 
+	cfg.DB.Model(&cBlog).Association("Thumbnail").Find(&cBlog.Thumbnail)
+
 	hp.RespSuccess(ctx, http.StatusOK, "Blog updated!", cBlog, "", nil)
 }
 
@@ -187,7 +191,7 @@ func DeleteCultureBlog(ctx *gin.Context) {
 	}
 
 	var cBlog models.CultureBlogs
-	err = cfg.DB.First(&cBlog, "id = ?", parsedID).Error
+	err = cfg.DB.Preload("Thumbnail").Preload("Timeline").Preload("Timeline.TimelineData").First(&cBlog, "id = ?", parsedID).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			hp.RespError(ctx, http.StatusNotFound, "Culture blog not found", nil, "Database did not find requested blog")

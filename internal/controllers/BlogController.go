@@ -191,7 +191,7 @@ func DeleteBlog(ctx *gin.Context) {
 	}
 
 	var blog models.Blogs
-	err = cfg.DB.Preload("Thumbnail").First(&blog, "id = ?", parsedID).Error
+	err = cfg.DB.Preload("Thumbnail").Preload("Timeline").Preload("Timeline.TimelineData").First(&blog, "id = ?", parsedID).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			hp.RespError(ctx, http.StatusNotFound, "Blog not found", nil,
