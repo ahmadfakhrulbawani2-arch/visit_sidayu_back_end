@@ -126,6 +126,7 @@ func main() {
 		{
 			si_api.GET("/", ctr.GetAllShopsAndUmkms)
 			si_api.GET("/id/:id", ctr.GetShopAndUmkmByID)
+			si_api.GET("/slug/:slug", ctr.GetShopAndUmkmBySlug)
 		}
 
 		tm_api := V1_api.Group("/timelines")
@@ -194,21 +195,21 @@ func main() {
 				ind_api.DELETE("/id/:id", ctr.DeleteIndustryBlog)
 			}
 
-			ofc_api := V1_api.Group("/officials")
+			ofc_api := protected.Group("/officials")
 			{
 				ofc_api.POST("/", ctr.CreateOfficial)
 				ofc_api.PATCH("/id/:id", ctr.UpdateOfficial)
 				ofc_api.DELETE("/id/:id", ctr.DeleteOfficial)
 			}
 
-			si_api := V1_api.Group("/shops-umkms")
+			si_api := protected.Group("/shops-umkms")
 			{
 				si_api.POST("/", ctr.CreateShopAndUmkm)
 				si_api.PATCH("/id/:id", ctr.UpdateShopAndUmkm)
 				si_api.DELETE("/id/:id", ctr.DeleteShopAndUmkm)
 			}
 
-			tm_api := V1_api.Group("/timelines")
+			tm_api := protected.Group("/timelines")
 			{
 				tm_api.POST("/", ctr.CreateTimeline)
 				tm_api.PATCH("/id/:id", ctr.UpdateTimeline)

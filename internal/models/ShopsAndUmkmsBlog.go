@@ -29,3 +29,14 @@ type CreateShopsAndUmkmsBlogsReq struct {
 	SalesRatesPiecePerDay int        `json:"sales_rates_per_day"`
 	ThumbnailID           *uuid.UUID `json:"thumbnail_id"`
 }
+
+type UpdateShopsAndUmkmsBlogsReq struct {
+	Title                 string     `json:"title" binding:"required"`
+	Content               string     `json:"content" binding:"required"`
+	Location              *string    `json:"location"`
+	Rating                *float64   `json:"rating"`
+	Revenue               *float64   `json:"revenue"`
+	MarketedProducts      []string   `json:"marketed_products" binding:"required"`
+	SalesRatesPiecePerDay *int       `json:"sales_rates_per_day"`
+	ThumbnailID           *uuid.UUID `json:"thumbnail_id"`
+}

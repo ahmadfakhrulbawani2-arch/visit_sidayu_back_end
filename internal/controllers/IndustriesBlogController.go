@@ -3,6 +3,7 @@ package controllers
 import (
 	"errors"
 	"net/http"
+	"slices"
 	cfg "visit-sidayu-backend/internal/config"
 	myE "visit-sidayu-backend/internal/constants/errorss"
 	hp "visit-sidayu-backend/internal/helpers"
@@ -144,6 +145,7 @@ func UpdateIndustryBlog(ctx *gin.Context) {
 		input.Location != nil ||
 		input.Rating != nil ||
 		input.Revenue != nil ||
+		(input.ProducedProducts != nil && !slices.Equal(input.ProducedProducts, iBlog.ProducedProducts)) ||
 		input.ProductionRatesPiecePerDay != nil ||
 		input.ThumbnailID != iBlog.ThumbnailID ||
 		input.YearFounded != iBlog.YearFounded ||
