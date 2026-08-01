@@ -158,7 +158,7 @@ func UpdateIndustryBlog(ctx *gin.Context) {
 	}
 
 	if input.Title != iBlog.Title {
-		hp.GenerateSlugWithTimestamp(iBlog.Title, &iBlog)
+		hp.GenerateSlugWithTimestamp(input.Title, &iBlog)
 	}
 
 	copier.CopyWithOption(&iBlog, &input, copier.Option{IgnoreEmpty: true, DeepCopy: true})

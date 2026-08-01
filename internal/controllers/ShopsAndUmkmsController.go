@@ -57,7 +57,7 @@ func GetShopAndUmkmByID(ctx *gin.Context) {
 	err = cfg.DB.Preload("Thumbnail").First(&suBlog, "id = ?", id).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			hp.RespError(ctx, http.StatusNotFound, singularSuBlog+myE.Msg404Err, nil)
+			hp.RespError(ctx, http.StatusNotFound, singularSuBlog+myE.Msg404Err, err)
 			return
 		}
 
@@ -79,7 +79,7 @@ func GetShopAndUmkmBySlug(ctx *gin.Context) {
 	err := cfg.DB.Preload("Thumbnail").First(&suBlog, "slug = ?", slug).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			hp.RespError(ctx, http.StatusNotFound, singularSuBlog+myE.Msg404Err, nil)
+			hp.RespError(ctx, http.StatusNotFound, singularSuBlog+myE.Msg404Err, err)
 			return
 		}
 
@@ -136,7 +136,7 @@ func UpdateShopAndUmkm(ctx *gin.Context) {
 	err = cfg.DB.First(&suBlog, "id = ?", id).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			hp.RespError(ctx, http.StatusNotFound, singularSuBlog+myE.Msg404Err, nil)
+			hp.RespError(ctx, http.StatusNotFound, singularSuBlog+myE.Msg404Err, err)
 			return
 		}
 
@@ -204,7 +204,7 @@ func DeleteShopAndUmkm(ctx *gin.Context) {
 	err = cfg.DB.Preload("Thumbnail").First(&suBlog, "id = ?", id).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			hp.RespError(ctx, http.StatusNotFound, singularSuBlog+myE.Msg404Err, nil, myE.Err404Fill)
+			hp.RespError(ctx, http.StatusNotFound, singularSuBlog+myE.Msg404Err, err)
 			return
 		}
 
