@@ -6,13 +6,6 @@ import "github.com/google/uuid"
 	Client must create role first and then create the officials
 */
 
-type Roles struct {
-	BaseModel
-	Name        string `json:"name" gorm:"not null"`
-	Level       int    `json:"level" gorm:"not null"`
-	Description string `json:"description" gorm:"not null"`
-}
-
 type Officials struct {
 	BaseModel
 	Name           string     `json:"name" gorm:"unique;not null"`
@@ -28,12 +21,6 @@ type CreateOfficials struct {
 	Description    string     `json:"description"`
 	RoleID         *uuid.UUID `json:"role_id" binding:"required"`
 	ProfileImageID *uuid.UUID `json:"profile_image_id"`
-}
-
-type CreateRoles struct {
-	Name        string `json:"name" binding:"required"`
-	Level       int    `json:"level" binding:"required"`
-	Description string `json:"description" binding:"required"`
 }
 
 type UpdateOfficials struct {

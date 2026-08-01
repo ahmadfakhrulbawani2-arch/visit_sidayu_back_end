@@ -11,11 +11,12 @@ var (
 	MsgSvrErr          = BaseSvrErr + Base5xx
 	MsgParseParamIdErr = "Failed to parse param 'id'. " + Base5xx
 	Msg404Err          = " not found. " + Base4xx
-	Msg400Err          = "Failed to parse incoming input. " + Base4xx
+	Msg400Err          = "Invalid input provided " + Base4xx
 	Msg401Err          = "Unauthorized access, read the error value!" + Base4xx
 	Msg409Err          = " already created. " + Base4xx
 	MsgNoInput         = "No fields provided for update. " + Base4xx
 
+	Err400Fill = "Failed to parse incoming input. " + Base4xx
 	Err409Fill = "Caught recreating/re-registering data"
 	Err404Fill = "Accessing non existent data"
 
