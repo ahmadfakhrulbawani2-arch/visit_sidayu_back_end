@@ -134,6 +134,11 @@ func main() {
 			tm_api.GET("/", ctr.GetAllTimelines)
 			tm_api.GET("/id/:id", ctr.GetTimelineByID)
 		}
+		rl_api := V1_api.Group("/roles")
+		{
+			rl_api.GET("/", ctr.GetAllRoles)
+			rl_api.GET("/id/:id", ctr.GetRoleById)
+		}
 
 		protected := V1_api.Group("/")
 		protected.Use(mdw.RequiredAuth()) // ✅
@@ -211,11 +216,17 @@ func main() {
 
 			tm_api := protected.Group("/timelines")
 			{
-				tm_api.POST("/", ctr.CreateTimeline)
+				// tm_api.POST("/", ctr.CreateTimeline)
 				tm_api.PATCH("/id/:id", ctr.UpdateTimeline)
 				tm_api.DELETE("/id/:id", ctr.DeleteTimeline)
 			}
 
+			rl_api := protected.Group("/roles")
+			{
+				rl_api.POST("/", ctr.CreateRole)
+				rl_api.PATCH("/id/:id", ctr.UpdateRole)
+				rl_api.DELETE("/id/:id", ctr.DeleteRole)
+			}
 		}
 	}
 

@@ -40,3 +40,18 @@ type CreateTimelines struct {
 	Description  string                   `json:"description"`
 	TimelineData []CreateTimelinesElement `json:"timeline_data" binding:"required,dive"`
 }
+
+type UpdateTimelinesElement struct {
+	ID *uuid.UUID `json:"id"`
+
+	Name             string    `json:"name"`
+	TimelineDatetime time.Time `json:"timeline_datetime"`
+	Description      string    `json:"description"`
+	ExternalLink     string    `json:"external_link"`
+}
+
+type UpdateTimelines struct {
+	Name         *string                  `json:"name"`
+	Description  *string                  `json:"description"`
+	TimelineData []UpdateTimelinesElement `json:"timeline_data"`
+}
