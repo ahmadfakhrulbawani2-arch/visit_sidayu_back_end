@@ -24,7 +24,7 @@ func GetAllRoles(ctx *gin.Context) {
 	query := cfg.DB.Model(&models.Roles{})
 	search := ctx.Query("search")
 	if search != "" {
-		query = query.Where("name LIKE ?", "%"+search+"%")
+		query = query.Where("name ILIKE ?", "%"+search+"%")
 	}
 
 	meta, offset := hp.CalcMeta(ctx, query)

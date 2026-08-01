@@ -216,7 +216,7 @@ func main() {
 
 			tm_api := protected.Group("/timelines")
 			{
-				tm_api.POST("/", ctr.CreateTimeline)
+				// tm_api.POST("/", ctr.CreateTimeline)
 				tm_api.PATCH("/id/:id", ctr.UpdateTimeline)
 				tm_api.DELETE("/id/:id", ctr.DeleteTimeline)
 			}
