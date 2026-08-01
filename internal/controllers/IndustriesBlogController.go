@@ -3,7 +3,6 @@ package controllers
 import (
 	"errors"
 	"net/http"
-	"slices"
 	cfg "visit-sidayu-backend/internal/config"
 	myE "visit-sidayu-backend/internal/constants/errorss"
 	hp "visit-sidayu-backend/internal/helpers"
@@ -11,6 +10,7 @@ import (
 	"visit-sidayu-backend/internal/models"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"github.com/jinzhu/copier"
 	"gorm.io/gorm"
 )
@@ -139,36 +139,55 @@ func UpdateIndustryBlog(ctx *gin.Context) {
 		return
 	}
 
-	hasUpdate := input.BusinessType != nil ||
-		input.Content != "" ||
-		input.EmployeesCount != nil ||
+	hasUpdate := input.Title != iBlog.Title ||
+		input.Content != iBlog.Content ||
 		input.Location != nil ||
-		!slices.Equal(input.ProducedProducts, iBlog.ProducedProducts) ||
-		input.ProductionRatesPiecePerDay != nil ||
 		input.Rating != nil ||
 		input.Revenue != nil ||
-		input.ThumbnailID != nil ||
-		input.Title != "" ||
-		input.YearFounded != nil
+		input.ProductionRatesPiecePerDay != nil ||
+		input.ThumbnailID != iBlog.ThumbnailID ||
+		input.YearFounded != iBlog.YearFounded ||
+		input.EmployeesCount != iBlog.EmployeesCount ||
+		input.BusinessType != iBlog.BusinessType
 
 	if !hasUpdate {
 		hp.RespError(ctx, http.StatusBadRequest, myE.MsgNoInput, nil, myE.Msg400Err)
 		return
 	}
 
-	copier.CopyWithOption(&iBlog, &input, copier.Option{IgnoreEmpty: true, DeepCopy: true})
-
-	if input.Title != "" {
+	if input.Title != iBlog.Title {
 		hp.GenerateSlugWithTimestamp(iBlog.Title, &iBlog)
 	}
 
-	err = cfg.DB.Save(&iBlog).Error
+	copier.CopyWithOption(&iBlog, &input, copier.Option{IgnoreEmpty: true, DeepCopy: true})
+
+	// 2. Tangani ThumbnailID secara manual agar bisa jadi NULL atau terganti dengan benar
+	if input.ThumbnailID != nil {
+		if *input.ThumbnailID == uuid.Nil {
+			// Jika dikirim null uuid (00000000-0000-0000-0000-000000000000), set NULL di DB
+			iBlog.ThumbnailID = nil
+			iBlog.Thumbnail = nil // Kosongkan relasi struct-nya juga
+		} else {
+			// Jika dikirim UUID valid, assign nilainya
+			val := *input.ThumbnailID
+			iBlog.ThumbnailID = &val
+		}
+	}
+
+	// Gunakan Save / Updates GORM.
+	// Catatan: Jika menggunakan .Save(), pastikan field iBlog.ThumbnailID terupdate dengan benar ke database.
+	err = cfg.DB.Session(&gorm.Session{FullSaveAssociations: false}).Save(&iBlog).Error
 	if err != nil {
 		hp.RespError(ctx, http.StatusInternalServerError, myE.BaseSvrErr, err)
 		return
 	}
 
-	cfg.DB.Model(&iBlog).Association("Thumbnail").Find(&iBlog.Thumbnail)
+	// Reload thumbnail jika ada
+	if iBlog.ThumbnailID != nil {
+		cfg.DB.Model(&iBlog).Association("Thumbnail").Find(&iBlog.Thumbnail)
+	} else {
+		iBlog.Thumbnail = nil
+	}
 
 	hp.RespSuccess(ctx, http.StatusOK, singularIBlog+myE.MsgPtc200, iBlog, "", nil)
 

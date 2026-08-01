@@ -37,15 +37,15 @@ type CreateIndustriesBlogsReq struct {
 }
 
 type UpdateIndustriesBlogsReq struct {
-	Title                      string     `json:"title"`
-	Content                    string     `json:"content"`
+	Title                      string     `json:"title" binding:"required"`
+	Content                    string     `json:"content" binding:"required"`
 	Location                   *string    `json:"location"`
 	Rating                     *float64   `json:"rating"`
 	Revenue                    *float64   `json:"revenue"`
 	ProducedProducts           []string   `json:"produced_products" binding:"required"`
 	ProductionRatesPiecePerDay *int       `json:"production_rates_per_day"`
 	ThumbnailID                *uuid.UUID `json:"thumbnail_id"`
-	YearFounded                *int       `json:"year_founded"`
-	EmployeesCount             *int       `json:"employees_count"`
-	BusinessType               *string    `json:"business_type"`
+	YearFounded                int        `json:"year_founded" binding:"required"`
+	EmployeesCount             int        `json:"employees_count" binding:"required"`
+	BusinessType               string     `json:"business_type" binding:"required"`
 }
