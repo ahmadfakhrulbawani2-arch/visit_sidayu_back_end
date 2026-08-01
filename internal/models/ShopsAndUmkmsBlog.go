@@ -8,7 +8,7 @@ import (
 type ShopsAndUmkmsBlogs struct {
 	BaseModel
 	Title                 string         `json:"title" gorm:"not null"`
-	Slug                  string         `json:"slug" gorm:"unique,not null"`
+	Slug                  string         `json:"slug" gorm:"unique;not null"`
 	Content               string         `json:"content" gorm:"not null"`
 	Location              string         `json:"location,omitempty"`
 	Rating                float64        `json:"rating,omitempty"`

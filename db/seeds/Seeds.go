@@ -1398,7 +1398,7 @@ func All() []seed.Seed {
 				return seed.CreateOfficial(db, models.CreateOfficials{
 					Name:           "Bapak Sidayu",
 					Description:    "Kepala kecamatan periode 2026-2031",
-					RoleID:         SavedRole.ID,
+					RoleID:         (*uuid.UUID)(&SavedRole.ID),
 					ProfileImageID: (*uuid.UUID)(&SavedImage.ID),
 				})
 			},
