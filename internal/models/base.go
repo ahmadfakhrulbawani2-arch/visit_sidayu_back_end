@@ -23,7 +23,10 @@ type Meta struct {
 }
 
 func (b *BaseModel) BeforeCreate(tx *gorm.DB) (err error) {
-	b.ID = uuid.New()
+	// WAJIB DICEK: Jika UUID belum ada nilainya (masih kosong), baru buat baru!
+	if b.ID == uuid.Nil {
+		b.ID = uuid.New()
+	}
 	return
 }
 

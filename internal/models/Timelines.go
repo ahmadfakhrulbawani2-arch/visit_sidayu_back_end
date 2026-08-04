@@ -42,7 +42,7 @@ type CreateTimelines struct {
 }
 
 type UpdateTimelinesElement struct {
-	ID *uuid.UUID `json:"id"`
+	ID *uuid.UUID `json:"ID"`
 
 	Name             string    `json:"name"`
 	TimelineDatetime time.Time `json:"timeline_datetime"`
