@@ -5,10 +5,12 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 	"visit-sidayu-backend/internal/config"
 	ctr "visit-sidayu-backend/internal/controllers"
 	mdw "visit-sidayu-backend/internal/middlewares"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 )
@@ -48,7 +50,15 @@ func main() {
 	server.SetTrustedProxies([]string{host})
 	serverUrl := fmt.Sprintf("%s:%s", host, port)
 
+	// apply middlewares
+	server.Use(cors.New(mdw.CorsConfig()))
+	server.Use(mdw.SecurityHeader())
+	server.Use(mdw.RequestID())
+	server.Use(mdw.BodyLimit(5 << 20)) // 5242880 Bytes = 5 MB
+	server.Use(mdw.Timeout(30 * time.Second))
+
 	V1_api := server.Group("/api/v1")
+	V1_api.Use(mdw.RateLimiter(5000.0/60.0, 5000)) // limit to 1000 requests per minute and burst of 1000
 	{
 		// health
 		V1_api.GET("/ping", func(ctx *gin.Context) {
@@ -64,11 +74,12 @@ func main() {
 		sa_api := V1_api.Group("/superadmins/auth")
 		{
 			// auth
-			sa_api.POST("/register", ctr.SuperAdminRegister) // ✅
-			sa_api.POST("/login", ctr.SuperadminLogin)       // ✅
+			sa_api.POST("/register", mdw.RateLimiter(10.0/60.0, 10), ctr.SuperAdminRegister) // ✅
+			sa_api.POST("/login", mdw.RateLimiter(20.0/60.0, 20), ctr.SuperadminLogin)       // ✅
 		}
 
 		img_api := V1_api.Group("/images")
+		img_api.Use(mdw.RateLimiter(2500.0/60.0, 1250)) // because its size access, better to limit the rate to 2500 requests per minute and burst of 1250
 		{
 			img_api.GET("/", ctr.GetImages)
 			img_api.GET("/id/:id", ctr.GetImageById)
@@ -141,7 +152,7 @@ func main() {
 		}
 
 		protected := V1_api.Group("/")
-		protected.Use(mdw.RequiredAuth()) // ✅
+		protected.Use(mdw.RateLimiter(500.0/60.0, 500),mdw.RequiredAuth()) // ✅
 		{
 			sa_api := protected.Group("/superadmins")
 			{
@@ -152,6 +163,7 @@ func main() {
 				sa_api.DELETE("/id/:id", ctr.DeleteSuperadmin) // ✅
 			}
 			img_api := protected.Group("/images")
+			img_api.Use(mdw.RateLimiter(250.0/60.0, 125))
 			{
 				img_api.POST("/", ctr.UploadImage)
 				img_api.PUT("/id/:id", ctr.UpdateImage)
