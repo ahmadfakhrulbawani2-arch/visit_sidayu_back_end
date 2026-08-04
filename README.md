@@ -4,31 +4,17 @@
   <img src="https://img.shields.io/badge/Go-%23363636.svg?style=for-the-badge&logo=go&logoColor=white&color=00ADD8">
   <img src="https://img.shields.io/badge/JWT-%23F8CC46.svg?style=for-the-badge&logo=jsonwebtokens&logoColor=white&color=000000">
   <img src="https://img.shields.io/badge/PostgreSQL-%23007ACC.svg?style=for-the-badge&logo=postgresql&logoColor=white&color=4169E1">
-  <img src="https://img.shields.io/github/repo-size/ahmadfakhrulbawani2-arch/simple_go_gin_gorm_postgres_be_template?style=for-the-badge&color=orange">
-  <img src="https://img.shields.io/github/stars/ahmadfakhrulbawani2-arch/simple_go_gin_gorm_postgres_be_template?style=for-the-badge&color=yellow">
-  <img src="https://img.shields.io/github/forks/ahmadfakhrulbawani2-arch/simple_go_gin_gorm_postgres_be_template?style=for-the-badge&color=purple">
+  <img src="https://img.shields.io/badge/NeonDB-%23007ACC.svg?style=for-the-badge&logo=neon&logoColor=white&color=34D59A"> <br />
+  <img src="https://img.shields.io/github/repo-size/ahmadfakhrulbawani2-arch/visit_sidayu_back_end?style=for-the-badge&color=orange">
+  <img src="https://img.shields.io/github/stars/ahmadfakhrulbawani2-arch/visit_sidayu_back_end?style=for-the-badge&color=yellow">
+  <img src="https://img.shields.io/github/forks/ahmadfakhrulbawani2-arch/visit_sidayu_back_end?style=for-the-badge&color=purple">
 </div>
 
 ## ℹ️ Overview
 
-This monorepo is my basic Go Backend REST API. The design architecture is my simplified version of more advance Go REST API template out there. The feature is complete and passed for MVP (Minimum Viable Product)
+Uissu, hello guys, welcome back to another project. I'd like to share with you, Visit Sidayu Back End. <br />
 
-Here is the list of this repo feature:<br />
-✅ Standard Go Framework using GIN-Gonic and Go ORM (GORM)<br />
-✅ Standard Json Web Token (JWT) authentication<br />
-✅ Unprotected and protected authorization routes<br />
-✅ Standard JSON response (header, data, meta)<br />
-✅ Plug and Play Postgre Integration<br />
-✅ Plug and Play Imagekit for media Storage<br />
-
-What's missing:<br />
-❌ Standard security middlewares (xss protection, cors, etc.) for simplicity and flexibility <br />
-❌ Comprehensive file upload to SDK such as Cloudflare R2 and AWS S3<br />
-❌ Async API features<br />
-❌ Infra and DevOps<br />
-❌ Granular migration (will be added for next development, currently only up and down all database tables) <br />
-I'll cover these missing feature in upcoming Go async app template.<br />
-To simplify this `README.md`, we move brief description inside [design-pattern.md](./design-pattern.md)
+Visit Sidayu Back End is a Go REST API using Gin, Gorm, and Postgres 18 via NeonDB and Imagekit storage. I developed this back end to serve as a personal project for my web development understanding. Feel free to ask me or contribute to this project. We appreciate any feedback or suggestions you may have.
 
 ## 🚀 Get Started
 
@@ -121,6 +107,16 @@ IMAGEKIT_PUBLIC_KEY=
 IMAGEKIT_PRIVATE_KEY=
 ```
 
+or you can execute:
+
+```sh
+# for bash
+cp .env.example .env
+
+# for powershell
+Copy-Item .env.example .env
+```
+
 6. Fix other code import with your `go.mod` module name.
 7. You can try to run the app with:
 
@@ -136,7 +132,9 @@ air
 
 ## 👩‍💻 Development Guide
 
-Development guide is explained briefly in `design-pattern.md` [here](./design-pattern.md). There I explain what the project structure are and how I develop with consistent pattern.
+Development guide is explained briefly in `design-pattern.md` [here](./design-pattern.md). There I explain what the project structure are and how I develop with consistent pattern. <br />
+
+For this project, I have created a lot of REST API endpoints. Let me explain it [here](./docs/api.md).
 
 ## 🔃 Contributing
 
