@@ -55,7 +55,7 @@ func main() {
 	server.Use(mdw.SecurityHeader())
 	server.Use(mdw.RequestID())
 	server.Use(mdw.BodyLimit(5 << 20)) // 5242880 Bytes = 5 MB
-	server.Use(mdw.Timeout(30 * time.Second))
+	server.Use(mdw.Timeout(30 * time.Second)) // TLE if 30 seconds elapsed
 
 	V1_api := server.Group("/api/v1")
 	V1_api.Use(mdw.RateLimiter(5000.0/60.0, 5000)) // limit to 1000 requests per minute and burst of 1000
