@@ -1,1 +1,7 @@
 .vscode/
+docs/
+Dockerfile
+*.json
+*.yaml
+.github
+*.md

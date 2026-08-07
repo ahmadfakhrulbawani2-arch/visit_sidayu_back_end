@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -10,7 +9,6 @@ import (
 	ctr "visit-sidayu-backend/internal/controllers"
 	mdw "visit-sidayu-backend/internal/middlewares"
 
-	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 )
@@ -18,40 +16,58 @@ import (
 func main() {
 	err := godotenv.Load()
 	if err != nil {
-		log.Fatal("Error loading .env file")
+		log.Println("Error loading .env file")
 	}
 	config.ConnectDB()
 	defer config.DisconnectDB()
 
 	server := gin.Default()
+	// mode := os.Getenv("RUN_MODE");
 
 	// pick host and port from env
-	var host, port string
-	switch mode := os.Getenv("RUN_MODE"); mode {
-	case "production":
-		host = os.Getenv("PROD_HOST")
-		port = os.Getenv("PROD_PORT")
+	// var host, port string
+	// this commented code below is for development
+	// switch mode {
+	// case "production":
+	// 	host = os.Getenv("PROD_HOST")
+	// 	port = os.Getenv("PROD_PORT")
 
-	case "development":
-		host = os.Getenv("DEV_HOST")
-		port = os.Getenv("DEV_PORT")
+	// case "development":
+	// 	host = os.Getenv("DEV_HOST")
+	// 	port = os.Getenv("DEV_PORT")
 
-	default:
-		// Fallback if RUN_MODE is empty, "development", or anything else
-		host = os.Getenv("DEV_HOST")
-		port = os.Getenv("DEV_PORT")
+	// default:
+	// 	// Fallback if RUN_MODE is empty, "development", or anything else
+	// 	host = os.Getenv("DEV_HOST")
+	// 	port = os.Getenv("DEV_PORT")
+	// }
+	//
+	// this port below is for deployment.
+	if PORT := os.Getenv("PORT"); PORT == "" {
+		port = "8080"
+	} else {
+		port = PORT
 	}
 
+	// for dev
 	// Fallback to localhost if host is still empty to prevent crashes
-	if host == "" {
-		host = "127.0.0.1"
-	}
+	// if host == "" {
+	// 	host = "127.0.0.1"
+	// }
 
-	server.SetTrustedProxies([]string{host})
-	serverUrl := fmt.Sprintf("%s:%s", host, port)
+	// if mode == "production" {
+	// 	server.SetTrustedProxies(nil);
+	// } else {
+	// 	server.SetTrustedProxies([]string{host})
+	// }
+
+	server.SetTrustedProxies(nil);
+	// serverUrl := fmt.Sprintf("%s:%s", host, port)
+	log.Printf("Listening on :%s\n", port)
 
 	// apply middlewares
-	server.Use(cors.New(mdw.CorsConfig()))
+	// for staging & deployment, I commented out the CORS middleware to avoid CORS issues
+	// server.Use(cors.New(mdw.CorsConfig()))
 	server.Use(mdw.SecurityHeader())
 	server.Use(mdw.RequestID())
 	server.Use(mdw.BodyLimit(5 << 20)) // 5242880 Bytes = 5 MB
@@ -245,5 +261,6 @@ func main() {
 		}
 	}
 
-	server.Run(serverUrl) // set endpoint root
+	// server.Run(serverUrl) // set endpoint root, for development
+	log.Fatal(server.Run(":" + port))
 }

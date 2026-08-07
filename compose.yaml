@@ -1,0 +1,12 @@
+services:
+    api:
+        build: .
+        container_name: visit-sidayu-api
+
+    env_file:
+        - .env
+
+    ports:
+        - "8080:8080"
+
+    restart: unless-stopped

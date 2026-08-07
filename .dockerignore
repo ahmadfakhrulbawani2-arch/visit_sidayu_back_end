@@ -1,0 +1,33 @@
+# Git
+.git
+.gitignore
+.github
+
+# IDE
+.vscode
+.idea
+.zed
+
+# Air
+.air.toml
+tmp/
+
+# Environment
+.env
+.env.*
+
+# Logs
+*.log
+
+# Build
+bin/
+dist/
+build/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Documentation
+README.md
+docs/
