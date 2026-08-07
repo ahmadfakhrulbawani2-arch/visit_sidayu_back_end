@@ -5,7 +5,7 @@ import (
 	"slices"
 	"visit-sidayu-backend/db"
 
-	cfg "visit-sidayu-backend/internal/config"
+	cfg "visit-sidayu-backend/pkg/config"
 
 	"github.com/joho/godotenv"
 )

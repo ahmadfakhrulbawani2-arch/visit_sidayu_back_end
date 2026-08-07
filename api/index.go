@@ -9,9 +9,9 @@ import (
 	"sync"
 	"time"
 
-	"visit-sidayu-backend/internal/config"
-	ctr "visit-sidayu-backend/internal/controllers"
-	mdw "visit-sidayu-backend/internal/middlewares"
+	"visit-sidayu-backend/pkg/config"
+	ctr "visit-sidayu-backend/pkg/controllers"
+	mdw "visit-sidayu-backend/pkg/middlewares"
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"

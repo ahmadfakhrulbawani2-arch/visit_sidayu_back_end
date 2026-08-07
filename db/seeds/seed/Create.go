@@ -2,9 +2,9 @@ package seed
 
 import (
 	"errors"
-	"visit-sidayu-backend/internal/helpers"
-	hp "visit-sidayu-backend/internal/helpers"
-	"visit-sidayu-backend/internal/models"
+	"visit-sidayu-backend/pkg/helpers"
+	hp "visit-sidayu-backend/pkg/helpers"
+	"visit-sidayu-backend/pkg/models"
 
 	"github.com/jinzhu/copier"
 	"gorm.io/gorm"

@@ -3,11 +3,11 @@ package controllers
 import (
 	"errors"
 	"net/http"
-	cfg "visit-sidayu-backend/internal/config"
-	myE "visit-sidayu-backend/internal/constants/errorss"
-	hp "visit-sidayu-backend/internal/helpers"
-	"visit-sidayu-backend/internal/helpers/validation"
-	"visit-sidayu-backend/internal/models"
+	cfg "visit-sidayu-backend/pkg/config"
+	myE "visit-sidayu-backend/pkg/constants/errorss"
+	hp "visit-sidayu-backend/pkg/helpers"
+	"visit-sidayu-backend/pkg/helpers/validation"
+	"visit-sidayu-backend/pkg/models"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"

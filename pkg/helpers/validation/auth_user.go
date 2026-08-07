@@ -2,8 +2,8 @@ package validation
 
 import (
 	"net/http"
-	myE "visit-sidayu-backend/internal/constants/errorss"
-	hp "visit-sidayu-backend/internal/helpers"
+	myE "visit-sidayu-backend/pkg/constants/errorss"
+	hp "visit-sidayu-backend/pkg/helpers"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"

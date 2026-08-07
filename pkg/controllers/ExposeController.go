@@ -2,7 +2,7 @@ package controllers
 
 import (
 	"net/http"
-	"visit-sidayu-backend/internal/helpers"
+	"visit-sidayu-backend/pkg/helpers"
 
 	"github.com/gin-gonic/gin"
 )

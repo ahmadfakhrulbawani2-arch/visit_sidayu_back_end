@@ -2,7 +2,7 @@ package middlewares
 
 import (
 	"time"
-	"visit-sidayu-backend/internal/constants/corscfg"
+	"visit-sidayu-backend/pkg/constants/corscfg"
 
 	"github.com/gin-contrib/cors"
 )

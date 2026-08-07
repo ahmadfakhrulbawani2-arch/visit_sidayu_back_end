@@ -3,7 +3,7 @@ package seeds
 import (
 	"time"
 	"visit-sidayu-backend/db/seeds/seed"
-	"visit-sidayu-backend/internal/models"
+	"visit-sidayu-backend/pkg/models"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"

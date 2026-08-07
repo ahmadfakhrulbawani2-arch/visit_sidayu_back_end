@@ -3,7 +3,7 @@ package helpers
 import (
 	"errors"
 	"slices"
-	"visit-sidayu-backend/internal/constants/input"
+	"visit-sidayu-backend/pkg/constants/input"
 )
 
 // population density, unit, error

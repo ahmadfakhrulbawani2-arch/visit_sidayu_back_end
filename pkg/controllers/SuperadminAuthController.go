@@ -6,9 +6,9 @@ import (
 	"os"
 	"strings"
 	"time"
-	cfg "visit-sidayu-backend/internal/config"
-	hp "visit-sidayu-backend/internal/helpers"
-	"visit-sidayu-backend/internal/models"
+	cfg "visit-sidayu-backend/pkg/config"
+	hp "visit-sidayu-backend/pkg/helpers"
+	"visit-sidayu-backend/pkg/models"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"

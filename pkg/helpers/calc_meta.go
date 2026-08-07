@@ -3,7 +3,7 @@ package helpers
 import (
 	"math"
 	"strconv"
-	"visit-sidayu-backend/internal/models"
+	"visit-sidayu-backend/pkg/models"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"

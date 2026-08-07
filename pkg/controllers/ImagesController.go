@@ -5,11 +5,11 @@ import (
 	"errors"
 	"net/http"
 	"os"
-	hp "visit-sidayu-backend/internal/helpers"
-	"visit-sidayu-backend/internal/helpers/validation"
-	"visit-sidayu-backend/internal/models"
+	hp "visit-sidayu-backend/pkg/helpers"
+	"visit-sidayu-backend/pkg/helpers/validation"
+	"visit-sidayu-backend/pkg/models"
 
-	cfg "visit-sidayu-backend/internal/config"
+	cfg "visit-sidayu-backend/pkg/config"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"

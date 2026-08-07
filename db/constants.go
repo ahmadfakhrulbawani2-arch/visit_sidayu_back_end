@@ -1,6 +1,6 @@
 package db
 
-import "visit-sidayu-backend/internal/models"
+import "visit-sidayu-backend/pkg/models"
 
 var ModelsRegistry = []any{
 	&models.Roles{},

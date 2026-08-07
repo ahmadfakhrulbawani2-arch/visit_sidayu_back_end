@@ -3,19 +3,19 @@ package controllers
 import (
 	"errors"
 	"net/http"
-	hp "visit-sidayu-backend/internal/helpers"
-	"visit-sidayu-backend/internal/models"
+	hp "visit-sidayu-backend/pkg/helpers"
+	"visit-sidayu-backend/pkg/models"
 
-	cfg "visit-sidayu-backend/internal/config"
+	cfg "visit-sidayu-backend/pkg/config"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/copier"
 	"gorm.io/gorm"
 
-	// "visit-sidayu-backend/internal/constants/errorss"
-	myE "visit-sidayu-backend/internal/constants/errorss"
-	// hp "visit-sidayu-backend/internal/helpers"
-	"visit-sidayu-backend/internal/helpers/validation"
+	// "visit-sidayu-backend/pkg/constants/errorss"
+	myE "visit-sidayu-backend/pkg/constants/errorss"
+	// hp "visit-sidayu-backend/pkg/helpers"
+	"visit-sidayu-backend/pkg/helpers/validation"
 )
 
 var (

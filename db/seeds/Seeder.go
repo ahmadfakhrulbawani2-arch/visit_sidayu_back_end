@@ -2,7 +2,7 @@ package seeds
 
 import (
 	"log"
-	cfg "visit-sidayu-backend/internal/config"
+	cfg "visit-sidayu-backend/pkg/config"
 
 	"github.com/joho/godotenv"
 )
