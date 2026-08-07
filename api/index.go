@@ -41,13 +41,6 @@ func initRouter() {
 
 	V1_api := router.Group("/api/v1")
 
-	V1_api.GET("/ping", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"status":  200,
-			"message": "pong",
-		})
-	})
-
 	V1_api.Use(mdw.RateLimiter(5000.0/60.0, 5000)) // limit to 1000 requests per minute and burst of 1000
 	{
 		// expose
