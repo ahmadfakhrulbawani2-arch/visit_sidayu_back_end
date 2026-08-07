@@ -1,10 +1,14 @@
-package main
+/*
+ * For vercel deployment, idk i try using render and i cant
+ * MIT License Copyright (c) 2026 Ahmad Fakhrul Bawani
+ */
+package api
 
 import (
-	"log"
 	"net/http"
-	"os"
+	"sync"
 	"time"
+
 	"visit-sidayu-backend/internal/config"
 	ctr "visit-sidayu-backend/internal/controllers"
 	mdw "visit-sidayu-backend/internal/middlewares"
@@ -13,68 +17,37 @@ import (
 	"github.com/joho/godotenv"
 )
 
-func main() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Println("Error loading .env file")
-	}
+var (
+	router *gin.Engine
+	once   sync.Once
+)
+
+func initRouter() {
+	_ = godotenv.Load()
+
 	config.ConnectDB()
-	defer config.DisconnectDB()
 
-	server := gin.Default()
-	// mode := os.Getenv("RUN_MODE");
+	gin.SetMode(gin.ReleaseMode)
 
-	// pick host and port from env
-	var port string
-	// var host string
-	// this commented code below is for development
-	// switch mode {
-	// case "production":
-	// 	host = os.Getenv("PROD_HOST")
-	// 	port = os.Getenv("PROD_PORT")
+	router = gin.New()
+	router.Use(gin.Logger())
+	router.Use(gin.Recovery())
 
-	// case "development":
-	// 	host = os.Getenv("DEV_HOST")
-	// 	port = os.Getenv("DEV_PORT")
+	router.Use(gin.Recovery())
+	router.Use(mdw.SecurityHeader())
+	router.Use(mdw.RequestID())
+	router.Use(mdw.BodyLimit(5 << 20))
+	router.Use(mdw.Timeout(30 * time.Second))
 
-	// default:
-	// 	// Fallback if RUN_MODE is empty, "development", or anything else
-	// 	host = os.Getenv("DEV_HOST")
-	// 	port = os.Getenv("DEV_PORT")
-	// }
-	//
-	// this port below is for deployment.
-	if PORT := os.Getenv("PORT"); PORT == "" {
-		port = "8080"
-	} else {
-		port = PORT
-	}
+	V1_api := router.Group("/api/v1")
 
-	// for dev
-	// Fallback to localhost if host is still empty to prevent crashes
-	// if host == "" {
-	// 	host = "127.0.0.1"
-	// }
+	V1_api.GET("/ping", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{
+			"status":  200,
+			"message": "pong",
+		})
+	})
 
-	// if mode == "production" {
-	// 	server.SetTrustedProxies(nil);
-	// } else {
-	// 	server.SetTrustedProxies([]string{host})
-	// }
-
-	server.SetTrustedProxies(nil);
-	// serverUrl := fmt.Sprintf("%s:%s", host, port)
-	// log.Printf("Listening on :%s\n", port)
-
-	// apply middlewares
-	// for staging & deployment, I commented out the CORS middleware to avoid CORS issues
-	// server.Use(cors.New(mdw.CorsConfig()))
-	server.Use(mdw.SecurityHeader())
-	server.Use(mdw.RequestID())
-	server.Use(mdw.BodyLimit(5 << 20)) // 5242880 Bytes = 5 MB
-	server.Use(mdw.Timeout(30 * time.Second)) // TLE if 30 seconds elapsed
-
-	V1_api := server.Group("/api/v1")
 	V1_api.Use(mdw.RateLimiter(5000.0/60.0, 5000)) // limit to 1000 requests per minute and burst of 1000
 	{
 		// expose
@@ -261,7 +234,10 @@ func main() {
 			}
 		}
 	}
+}
 
-	// server.Run(serverUrl) // set endpoint root, for development
-	log.Fatal(server.Run(":" + port))
+func Handler(w http.ResponseWriter, r *http.Request) {
+	once.Do(initRouter)
+
+	router.ServeHTTP(w, r)
 }
