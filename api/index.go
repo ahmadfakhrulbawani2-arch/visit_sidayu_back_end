@@ -13,6 +13,7 @@ import (
 	ctr "visit-sidayu-backend/pkg/controllers"
 	mdw "visit-sidayu-backend/pkg/middlewares"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 )
@@ -33,6 +34,7 @@ func initRouter() {
 	router.Use(gin.Logger())
 	router.Use(gin.Recovery())
 
+	router.Use(cors.New(mdw.CorsConfig()))
 	router.Use(gin.Recovery())
 	router.Use(mdw.SecurityHeader())
 	router.Use(mdw.RequestID())
