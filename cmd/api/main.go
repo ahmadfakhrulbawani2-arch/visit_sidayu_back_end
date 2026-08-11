@@ -9,6 +9,7 @@ import (
 	ctr "visit-sidayu-backend/pkg/controllers"
 	mdw "visit-sidayu-backend/pkg/middlewares"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 )
@@ -68,7 +69,7 @@ func main() {
 
 	// apply middlewares
 	// for staging & deployment, I commented out the CORS middleware to avoid CORS issues
-	// server.Use(cors.New(mdw.CorsConfig()))
+	server.Use(cors.New(mdw.CorsConfig()))
 	server.Use(mdw.SecurityHeader())
 	server.Use(mdw.RequestID())
 	server.Use(mdw.BodyLimit(5 << 20)) // 5242880 Bytes = 5 MB

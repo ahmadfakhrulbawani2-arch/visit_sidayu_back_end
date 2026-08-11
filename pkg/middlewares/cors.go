@@ -23,6 +23,13 @@ func CorsConfig() cors.Config {
 			"Origin",
 			"Authorization",
 			"Content-Type",
+			"Accept-Encoding",
+			"X-CSRF-Token",
+			"Authorization",
+			"accept",
+			"origin",
+			"Cache-Control",
+			"X-Requested-With",
 		},
 		// only expose these HTTP headers to the client
 		ExposeHeaders: []string{

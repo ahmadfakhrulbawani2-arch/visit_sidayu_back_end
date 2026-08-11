@@ -4,6 +4,10 @@ var(
 	AllowedOrigins = []string{
 		"http://localhost:3000",
 		"http://localhost:3001",
+		"http://10.73.51.153:3000",
+		"http://10.73.51.153:3001",
+		"http://192.168.1.9:3000",
+		"http://10.46.17.153:3000",
 		"https://visit-sidayu-front-end.vercel.app",
 	}
 	AllowedMethods = []string{
