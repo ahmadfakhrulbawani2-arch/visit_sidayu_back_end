@@ -177,6 +177,7 @@ func main() {
 		{
 			sa_api := protected.Group("/superadmins")
 			{
+				sa_api.GET("/auth/jwt", ctr.GetJwtValidated)
 				sa_api.GET("/me", ctr.SuperadminCurrent)       // ✅
 				sa_api.GET("", ctr.GetAllSuperadmins)         // ✅
 				sa_api.GET("/id/:id", ctr.GetSuperadminByID)   // ✅

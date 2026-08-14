@@ -145,3 +145,13 @@ func SuperadminCurrent(ctx *gin.Context) {
 
 	hp.RespSuccess(ctx, http.StatusOK, "Current user data fetched!", user, "", nil)
 }
+
+func GetJwtValidated(ctx *gin.Context) {
+	_, err := hp.GetUserIDFromCtx(ctx)
+	if err != nil {
+		hp.RespError(ctx, http.StatusUnauthorized, "Unauthorized access, read the error value!", err)
+		return
+	}
+
+	ctx.Status(http.StatusNoContent)
+}
