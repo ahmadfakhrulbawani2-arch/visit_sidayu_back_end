@@ -39,3 +39,4 @@ go.work.sum
 
 # dev's private
 private/
+db/
