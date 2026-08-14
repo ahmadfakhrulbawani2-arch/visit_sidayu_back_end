@@ -23,3 +23,8 @@ type UpdateSuperadminDTO struct {
 	Password    string  `json:"password" binding:"required"`
 	NewPassword *string `json:"new_password"`
 }
+
+type GetSuperadminJwtValidated struct {
+	Username string `json:"username" binding:"required"`
+	Email    string `json:"email" binding:"required,email"`
+}

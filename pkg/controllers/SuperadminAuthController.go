@@ -146,10 +146,34 @@ func SuperadminCurrent(ctx *gin.Context) {
 	hp.RespSuccess(ctx, http.StatusOK, "Current user data fetched!", user, "", nil)
 }
 
-func GetJwtValidated(ctx *gin.Context) {
-	_, err := hp.GetUserIDFromCtx(ctx)
+// POST /api/v1/superadmins/auth/me
+func PostGetJwtValidated(ctx *gin.Context) {
+	userID, err := hp.GetUserIDFromCtx(ctx)
 	if err != nil {
 		hp.RespError(ctx, http.StatusUnauthorized, "Unauthorized access, read the error value!", err)
+		return
+	}
+
+	var input models.GetSuperadminJwtValidated
+	if err := ctx.ShouldBindJSON(&input); err != nil {
+		hp.RespError(ctx, http.StatusBadRequest, "Failed to parse incoming login input", err)
+		return
+	}
+
+	var user models.Superadmins
+	userDataErr := cfg.DB.Select("username", "email").First(&user, "id = ?", userID).Error
+
+	if userDataErr != nil {
+		if errors.Is(userDataErr, gorm.ErrRecordNotFound) {
+			hp.RespError(ctx, http.StatusUnauthorized, "Unauthorized access, read the error value!", err)
+			return
+		}
+		hp.RespError(ctx, http.StatusInternalServerError, "Database error", nil, userDataErr.Error())
+		return
+	}
+
+	if user.Username != input.Username || user.Email != input.Email {
+		hp.RespError(ctx, http.StatusUnauthorized, "Unauthorized access, read the error value!", nil, "username or email does not match")
 		return
 	}
 
