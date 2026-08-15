@@ -62,7 +62,7 @@ func initRouter() {
 		sa_api := V1_api.Group("/superadmins/auth")
 		{
 			// auth
-			sa_api.POST("/register", mdw.RateLimiter(10.0/60.0, 10), ctr.SuperAdminRegister) // ✅
+			// sa_api.POST("/register", mdw.RateLimiter(10.0/60.0, 10), ctr.SuperAdminRegister) // ✅
 			sa_api.POST("/login", mdw.RateLimiter(20.0/60.0, 20), ctr.SuperadminLogin)       // ✅
 		}
 
@@ -144,7 +144,11 @@ func initRouter() {
 		{
 			sa_api := protected.Group("/superadmins")
 			{
-				sa_api.POST("/auth/jwt", ctr.PostGetJwtValidated)
+				auth_api := sa_api.Group("/auth")
+				{
+					auth_api.POST("/register", mdw.RateLimiter(10.0/60.0, 10), ctr.SuperAdminRegister)
+					auth_api.POST("/jwt", mdw.RateLimiter(500.0/60.0, 500), ctr.PostGetJwtValidated)
+				}
 				sa_api.GET("/me", ctr.SuperadminCurrent)       // ✅
 				sa_api.GET("", ctr.GetAllSuperadmins)         // ✅
 				sa_api.GET("/id/:id", ctr.GetSuperadminByID)   // ✅

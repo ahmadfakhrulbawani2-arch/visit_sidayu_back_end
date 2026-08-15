@@ -75,6 +75,11 @@ func SuperadminLogin(ctx *gin.Context) {
 
 // POST /api/v1/superadmins/auth/register
 func SuperAdminRegister(ctx *gin.Context) {
+	_, err := hp.GetUserIDFromCtx(ctx)
+	if err != nil {
+		hp.RespError(ctx, http.StatusUnauthorized, "Unauthorized access, read the error value!", err)
+		return
+	}
 	var input models.CreateSuperadmins
 	if err := ctx.ShouldBindJSON(&input); err != nil {
 		hp.RespError(ctx, http.StatusBadRequest, "Failed to parse incoming login input", err)
