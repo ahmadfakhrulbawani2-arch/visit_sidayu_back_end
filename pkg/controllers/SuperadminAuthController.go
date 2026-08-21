@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"os"
 	"strings"
-	"time"
 	cfg "visit-sidayu-backend/pkg/config"
+	"visit-sidayu-backend/pkg/helpers"
 	hp "visit-sidayu-backend/pkg/helpers"
 	"visit-sidayu-backend/pkg/models"
 
@@ -59,18 +59,24 @@ func SuperadminLogin(ctx *gin.Context) {
 		return
 	}
 
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"sub": superadmin.ID.String(),
-		"exp": time.Now().Add(7 * 24 * time.Hour).Unix(),
-	})
-
-	tokenStr, err := token.SignedString([]byte(os.Getenv("JWT_SECRET")))
+	accessToken, refreshToken, err := helpers.GenerateTokens(superadmin.ID.String())
 	if err != nil {
-		hp.RespError(ctx, http.StatusInternalServerError, "Failed to create JWT", err)
+		hp.RespError(ctx, http.StatusInternalServerError, "Failed to create tokens", err)
 		return
 	}
 
-	hp.RespSuccess(ctx, http.StatusOK, "Login success!", superadmin, tokenStr, nil)
+	isSecure := os.Getenv("GIN_MODE") == "production" // True jika production
+	ctx.SetCookie(
+		"refresh_token",    // Nama cookie
+		refreshToken,       // Nilai refresh token
+		7*24*60*60,         // Max age dalam detik (7 hari)
+		"/api/v1/superadmins/auth/jwt/refresh", // refresh token endpoint
+		"",                 // Domain
+		isSecure,           // Secure (true jika HTTPS)
+		true,               // HttpOnly (mencegah akses via JavaScript / XSS)
+	)
+
+	hp.RespSuccess(ctx, http.StatusOK, "Login success!", superadmin, accessToken, nil)
 }
 
 // POST /api/v1/superadmins/auth/register
@@ -151,7 +157,7 @@ func SuperadminCurrent(ctx *gin.Context) {
 	hp.RespSuccess(ctx, http.StatusOK, "Current user data fetched!", user, "", nil)
 }
 
-// POST /api/v1/superadmins/auth/me
+// POST /api/v1/superadmins/auth/jwt
 func PostGetJwtValidated(ctx *gin.Context) {
 	userID, err := hp.GetUserIDFromCtx(ctx)
 	if err != nil {
@@ -182,5 +188,96 @@ func PostGetJwtValidated(ctx *gin.Context) {
 		return
 	}
 
+	ctx.Status(http.StatusNoContent)
+}
+
+// POST /api/v1/superadmins/auth/jwt/refresh
+func SuperadminRefreshToken(ctx *gin.Context) {
+	// 🍪 Ambil Refresh Token dari Cookie
+	cookieRefreshToken, err := ctx.Cookie("refresh_token")
+	if err != nil {
+		hp.RespError(ctx, http.StatusUnauthorized, "Refresh token not found in cookie", err)
+		return
+	}
+
+	// Parse dan validasi Refresh Token
+	token, err := jwt.Parse(cookieRefreshToken, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, errors.New("unexpected signing method")
+		}
+		return []byte(os.Getenv("JWT_REFRESH_SECRET")), nil // Atau os.Getenv("JWT_SECRET")
+	})
+
+	if err != nil || !token.Valid {
+		hp.RespError(ctx, http.StatusUnauthorized, "Invalid or expired refresh token", err)
+		return
+	}
+
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok {
+		hp.RespError(ctx, http.StatusUnauthorized, "Invalid token claims", nil)
+		return
+	}
+
+	// Pastikan tipe token adalah "refresh"
+	if tokenType, ok := claims["type"].(string); !ok || tokenType != "refresh" {
+		hp.RespError(ctx, http.StatusUnauthorized, "Invalid token type", nil)
+		return
+	}
+
+	superadminID, ok := claims["sub"].(string)
+	if !ok {
+		hp.RespError(ctx, http.StatusUnauthorized, "Invalid token subject", nil)
+		return
+	}
+
+	// Cek apakah user masih ada di database
+	var superadmin models.Superadmins
+	if err := cfg.DB.First(&superadmin, "id = ?", superadminID).Error; err != nil {
+		hp.RespError(ctx, http.StatusUnauthorized, "User no longer exists", err)
+		return
+	}
+
+	// Generate sepasang token baru (opsional: implementasikan token rotation)
+	newAccessToken, newRefreshToken, err := helpers.GenerateTokens(superadminID)
+	if err != nil {
+		hp.RespError(ctx, http.StatusInternalServerError, "Failed to generate new tokens", err)
+		return
+	}
+
+	// 🔄 Perbarui Refresh Token di Cookie (Token Rotation)
+	isSecure := os.Getenv("GIN_MODE") == "release"
+	ctx.SetCookie(
+		"refresh_token",
+		newRefreshToken,
+		7*24*60*60,
+		"/api/v1/superadmins/auth/refresh",
+		"",
+		isSecure,
+		true,
+	)
+
+	// Kembalikan Access Token yang baru melalui JSON response body
+	responseData := map[string]any{
+		"access_token": newAccessToken,
+	}
+
+	hp.RespSuccess(ctx, http.StatusOK, "Token refreshed successfully!", responseData, "", nil)
+}
+
+// POST /api/v1/superadmins/auth/jwt/logout
+func SuperadminLogout(ctx *gin.Context) {
+	isSecure := os.Getenv("GIN_MODE") == "release"
+	ctx.SetCookie(
+		"refresh_token",
+		"",
+		-1,
+		"/api/v1/superadmins/auth/jwt/refresh", // Sesuaikan path-nya agar sama persis dengan saat set cookie
+		"",
+		isSecure,
+		true,
+	)
+
+	// hp.RespSuccess(ctx, http.StatusOK, "Logout success!", nil, "", nil)
 	ctx.Status(http.StatusNoContent)
 }

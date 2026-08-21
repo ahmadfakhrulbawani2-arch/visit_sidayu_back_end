@@ -148,6 +148,8 @@ func initRouter() {
 				{
 					auth_api.POST("/register", mdw.RateLimiter(10.0/60.0, 10), ctr.SuperAdminRegister)
 					auth_api.POST("/jwt", mdw.RateLimiter(500.0/60.0, 500), ctr.PostGetJwtValidated)
+					auth_api.POST("/jwt/refresh", mdw.RateLimiter(500.0/60.0, 500), ctr.SuperadminRefreshToken)
+					auth_api.POST("/jwt/logout", mdw.RateLimiter(500.0/60.0, 500), ctr.SuperadminLogout)
 				}
 				sa_api.GET("/me", ctr.SuperadminCurrent)       // ✅
 				sa_api.GET("", ctr.GetAllSuperadmins)         // ✅
